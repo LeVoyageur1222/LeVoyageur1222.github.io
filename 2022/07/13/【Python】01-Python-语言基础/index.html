@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="本文将从 Python 语言特性、Python 基本变量类型和 Python 基本运算符三个角度介绍 Python，并做一定延申，介绍包含变量深浅拷贝、命名空间、垃圾回收机制等一些编程语言的基本知识。">
+  <meta name="description" content="本文将从 Python 语言特性、Python 基本变量类型和 Python 基本运算符三个角度介绍 Python，并做一定延申，介绍包含变量深浅拷贝等一些编程语言的基本知识。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Python】01 Python 语言基础">
 <meta property="og:url" content="https://levoyageur1222.github.io/2022/07/13/%E3%80%90Python%E3%80%9101-Python-%E8%AF%AD%E8%A8%80%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="LeVoyageur">
-<meta property="og:description" content="本文将从 Python 语言特性、Python 基本变量类型和 Python 基本运算符三个角度介绍 Python，并做一定延申，介绍包含变量深浅拷贝、命名空间、垃圾回收机制等一些编程语言的基本知识。">
+<meta property="og:description" content="本文将从 Python 语言特性、Python 基本变量类型和 Python 基本运算符三个角度介绍 Python，并做一定延申，介绍包含变量深浅拷贝等一些编程语言的基本知识。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-07-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-13T02:16:55.751Z">
+<meta property="article:modified_time" content="2022-07-13T07:37:55.698Z">
 <meta property="article:author" content="Hz Xie">
 <meta name="twitter:card" content="summary">
 
@@ -176,7 +176,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-07-13 00:00:00 / 修改时间：10:16:55" itemprop="dateCreated datePublished" datetime="2022-07-13T00:00:00+08:00">2022-07-13</time>
+              <time title="创建时间：2022-07-13 00:00:00 / 修改时间：15:37:55" itemprop="dateCreated datePublished" datetime="2022-07-13T00:00:00+08:00">2022-07-13</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -199,7 +199,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>本文将从 <strong>Python 语言特性</strong>、<strong>Python 基本变量类型</strong>和 <strong>Python 基本运算符</strong>三个角度介绍 Python，并做一定延申，介绍包含<strong>变量深浅拷贝</strong>、<strong>命名空间</strong>、<strong>垃圾回收机制</strong>等一些编程语言的基本知识。</p>
+        <p>本文将从 <strong>Python 语言特性</strong>、<strong>Python 基本变量类型</strong>和 <strong>Python 基本运算符</strong>三个角度介绍 Python，并做一定延申，介绍包含<strong>变量深浅拷贝</strong>等一些编程语言的基本知识。</p>
 <span id="more"></span>
 
 <h2 id="Python-语言特性"><a href="#Python-语言特性" class="headerlink" title="Python 语言特性"></a>Python 语言特性</h2><h3 id="dynamic"><a href="#dynamic" class="headerlink" title="dynamic"></a>dynamic</h3><p>Python是一门<strong>动态编译</strong>的语言。最直接的体现就是Python只在运行时检查数据类型，所以不需要在编写程序时显式地声明数据类型。此外，静态编译的语言和动态编译的语言区别如下表所示</p>
@@ -304,7 +304,18 @@
 
 <p>第一句赋值语句的含义是在内存空间中创建一片内存空间存储整型数据<code>6</code>，并由引用<code>a</code>指向；第二句赋值语句则是在内存空间中再创建一片内存空间存储字符串<code>hello</code>，并修改引用<code>a</code>指向它。</p>
 <p>但是事实上，这样的说法不是完全准确的——即修改变量类型时并不总是要修改引用。那么什么变量需要修改呢？这引出下面的知识点：可变对象与不可变对象。</p>
-<h3 id="可变对象-vs-不可变对象"><a href="#可变对象-vs-不可变对象" class="headerlink" title="可变对象 vs 不可变对象"></a>可变对象 vs 不可变对象</h3>
+<h3 id="可变对象-vs-不可变对象"><a href="#可变对象-vs-不可变对象" class="headerlink" title="可变对象 vs 不可变对象"></a>可变对象 vs 不可变对象</h3><p>所谓的可变对象和不可变对象，出自于可变数据类型和不可变数据类型。其定义如下：</p>
+<ul>
+<li>可变数据类型：当该数据类型对应的变量的值发生变化时，对应的内存地址不发生对应改变的类型，即可以修改原本地址存在的数据。</li>
+<li>不可变数据类型：当该数据类型对应的变量的值发生变化时，对应的内存地址发生改变，即需要开辟新的空间存储对应的数据。此时若强行修改数据会报错。</li>
+</ul>
+<p>可变数据类型和不可变数据类型分别对应如下几种类型：</p>
+<ul>
+<li>可变数据类型：<code>set</code>、<code>list</code>、<code>dict</code></li>
+<li>不可变数据类型：<code>int</code>、<code>float</code>、<code>bool</code>、<code>string</code>、<code>tuple</code></li>
+</ul>
+<p>所以上文提到的由整型变量转变为字符串型变量，才是修改引用地址。若改变列表中的某一个元素，则会直接在源地址修改数据，这是可变对象和不可变对象的本质区别。</p>
+<h3 id="Python-复合数据类型"><a href="#Python-复合数据类型" class="headerlink" title="Python 复合数据类型"></a>Python 复合数据类型</h3><h4 id="Tuple"><a href="#Tuple" class="headerlink" title="Tuple"></a>Tuple</h4><h4 id="List"><a href="#List" class="headerlink" title="List"></a>List</h4><h4 id="Dict"><a href="#Dict" class="headerlink" title="Dict"></a>Dict</h4><h3 id="【扩展】深拷贝-vs-浅拷贝"><a href="#【扩展】深拷贝-vs-浅拷贝" class="headerlink" title="【扩展】深拷贝 vs 浅拷贝"></a>【扩展】深拷贝 vs 浅拷贝</h3><h4 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h4><h4 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h4><h2 id="Python-基本运算符"><a href="#Python-基本运算符" class="headerlink" title="Python 基本运算符"></a>Python 基本运算符</h2>
     </div>
 
     
@@ -381,7 +392,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-%E8%AF%AD%E8%A8%80%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">Python 语言特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dynamic"><span class="nav-number">1.1.</span> <span class="nav-text">dynamic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interpreted"><span class="nav-number">1.2.</span> <span class="nav-text">interpreted</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#object-oriented"><span class="nav-number">1.3.</span> <span class="nav-text">object-oriented</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-%E5%9F%BA%E6%9C%AC%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">Python 基本变量类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%BC%95%E7%94%A8-vs-%E5%8F%98%E9%87%8F%E6%95%B0%E6%8D%AE"><span class="nav-number">2.1.</span> <span class="nav-text">变量引用 vs 变量数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E5%8F%98%E5%AF%B9%E8%B1%A1-vs-%E4%B8%8D%E5%8F%AF%E5%8F%98%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.2.</span> <span class="nav-text">可变对象 vs 不可变对象</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-%E8%AF%AD%E8%A8%80%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">Python 语言特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dynamic"><span class="nav-number">1.1.</span> <span class="nav-text">dynamic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interpreted"><span class="nav-number">1.2.</span> <span class="nav-text">interpreted</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#object-oriented"><span class="nav-number">1.3.</span> <span class="nav-text">object-oriented</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-%E5%9F%BA%E6%9C%AC%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">Python 基本变量类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%BC%95%E7%94%A8-vs-%E5%8F%98%E9%87%8F%E6%95%B0%E6%8D%AE"><span class="nav-number">2.1.</span> <span class="nav-text">变量引用 vs 变量数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E5%8F%98%E5%AF%B9%E8%B1%A1-vs-%E4%B8%8D%E5%8F%AF%E5%8F%98%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.2.</span> <span class="nav-text">可变对象 vs 不可变对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python-%E5%A4%8D%E5%90%88%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">Python 复合数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Tuple"><span class="nav-number">2.3.1.</span> <span class="nav-text">Tuple</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#List"><span class="nav-number">2.3.2.</span> <span class="nav-text">List</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dict"><span class="nav-number">2.3.3.</span> <span class="nav-text">Dict</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E3%80%90%E6%89%A9%E5%B1%95%E3%80%91%E6%B7%B1%E6%8B%B7%E8%B4%9D-vs-%E6%B5%85%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.4.</span> <span class="nav-text">【扩展】深拷贝 vs 浅拷贝</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%B1%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.4.1.</span> <span class="nav-text">深拷贝</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%85%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.4.2.</span> <span class="nav-text">浅拷贝</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-%E5%9F%BA%E6%9C%AC%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-number">3.</span> <span class="nav-text">Python 基本运算符</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -397,14 +408,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
