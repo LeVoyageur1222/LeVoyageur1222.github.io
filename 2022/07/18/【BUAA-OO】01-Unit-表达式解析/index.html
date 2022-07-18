@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本单元作业的整体任务是对输入的函数表达式进行解析，返回一个化简后的表达式。其中函数表达式包括表达式、项、因子三个层次，而因子又包含幂因子、数字因子、三角因子、求和因子、自定义函数因子等种类。而化简的要求，则是最终表达式不含求和因子与自定义函数（即进行代入操作），且不含多余的未展开括号（即进行展开操作）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【BUAA-OO】01 Unit 表达式解析">
+<meta property="og:url" content="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9101-Unit-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="LeVoyageur">
+<meta property="og:description" content="本单元作业的整体任务是对输入的函数表达式进行解析，返回一个化简后的表达式。其中函数表达式包括表达式、项、因子三个层次，而因子又包含幂因子、数字因子、三角因子、求和因子、自定义函数因子等种类。而化简的要求，则是最终表达式不含求和因子与自定义函数（即进行代入操作），且不含多余的未展开括号（即进行展开操作）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit1_hw3_uml.png">
+<meta property="article:published_time" content="2022-07-18T03:30:00.000Z">
+<meta property="article:modified_time" content="2022-07-18T03:04:17.953Z">
+<meta property="article:author" content="Hz Xie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit1_hw3_uml.png">
+
+<link rel="canonical" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9101-Unit-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%A7%A3%E6%9E%90/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【BUAA-OO】01 Unit 表达式解析 | LeVoyageur</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LeVoyageur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9101-Unit-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Hz Xie">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LeVoyageur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【BUAA-OO】01 Unit 表达式解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-18 11:30:00 / 修改时间：11:04:17" itemprop="dateCreated datePublished" datetime="2022-07-18T11:30:00+08:00">2022-07-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BUAA-OO/" itemprop="url" rel="index"><span itemprop="name">BUAA-OO</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本单元作业的整体任务是对输入的函数表达式进行解析，返回一个化简后的表达式。其中函数表达式包括<strong>表达式、项、因子</strong>三个层次，而因子又包含幂因子、数字因子、三角因子、求和因子、自定义函数因子等种类。而化简的要求，则是最终表达式不含求和因子与自定义函数（即进行<strong>代入</strong>操作），且不含多余的未展开括号（即进行<strong>展开</strong>操作）。</p>
+<span id="more"></span>
+
+<h2 id="架构思路"><a href="#架构思路" class="headerlink" title="架构思路"></a>架构思路</h2><h3 id="作业概述"><a href="#作业概述" class="headerlink" title="作业概述"></a>作业概述</h3><p>本单元作业的整体任务是对输入的函数表达式进行解析，返回一个化简后的表达式。其中函数表达式包括<strong>表达式、项、因子</strong>三个层次，而因子又包含幂因子、数字因子、三角因子、求和因子、自定义函数因子等种类。而化简的要求，则是最终表达式不含求和因子与自定义函数（即进行<strong>代入</strong>操作），且不含多余的未展开括号（即进行<strong>展开</strong>操作）。</p>
+<h3 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h3><p>面对表达式化简的大任务，我们可以将其拆分为两个部分：<strong>表达式解析</strong>与<strong>表达式化简</strong>。其中表达式解析任务是将输入的字符串解析为具体的表达式类进行存储，针对此任务，作者采用课程组教授的<strong>递归下降</strong>解析方法，将字符串递归拆分成<strong>表达式-项-因子</strong>的递归向下结构进行存储；而针对表达式化简任务，作者采用了<strong>步骤分离+递归解析</strong>的整体方法，将化简过程分为了<strong>函数代入-表达式降幂-表达式展开-项内合并-项间合并</strong>五个步骤，每个步骤通过单独的类进行实现，且在类内也遵循了递归向下的解析方法。</p>
+<h3 id="设计优劣分析"><a href="#设计优劣分析" class="headerlink" title="设计优劣分析"></a>设计优劣分析</h3><p>整体架构的优势是<strong>解耦合度较高</strong>，实现了每一步的操作分离，<strong>易于定位bug</strong>的发生地，而且所有的方法均采用递归下降的思路，代码整体连贯易读，且对递归结构能够自然拆包解析；</p>
+<p>架构的不足是在很多细节处还不能体现面向对象的思想，例如对于每一个化简步骤，由于我采用一种递归解析的方法，所以事实上每一个表达式层次都有对应的方法，即这是表达式类都要实现的公共方法，<strong>应该设计为接口</strong>更为合适。</p>
+<h2 id="程序结构度量"><a href="#程序结构度量" class="headerlink" title="程序结构度量"></a>程序结构度量</h2><h3 id="UML类图"><a href="#UML类图" class="headerlink" title="UML类图"></a>UML类图</h3><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit1_hw3_uml.png"></p>
+<p>由类图可以更清楚地看出设计的整体思路：首先通过第一阶段的递归下降将输入的字符串解析成为层次化的表达式结构；之后通过第二阶段的五个步骤将表达式进行逐步解析。其中在合并过程中，我单独实现了Equal类对表达式的每一个层次进行比较，避免了重写equals方法容易出现bug的问题；此外，对于化简步骤本身的递归方法，我在处理类中实现，而别的方法我则在具体的表达式类中实现，从一定程度上避免了巨类的出现，整体代码结构比较平衡。</p>
+<h3 id="类方法度量"><a href="#类方法度量" class="headerlink" title="类方法度量"></a>类方法度量</h3><table>
+<thead>
+<tr>
+<th>method</th>
+<th>CogC</th>
+<th>ev(G)</th>
+<th>iv(G)</th>
+<th align="right">v(G)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>op.Plugin.parseVars(String)</td>
+<td>23.0</td>
+<td>1.0</td>
+<td>10.0</td>
+<td align="right">11.0</td>
+</tr>
+<tr>
+<td>op.Equal.equPow(Pow, Pow)</td>
+<td>14.0</td>
+<td>6.0</td>
+<td>11.0</td>
+<td align="right">14.0</td>
+</tr>
+<tr>
+<td>op.Equal.canMergeTerm(Term, Term)</td>
+<td>12.0</td>
+<td>2.0</td>
+<td>5.0</td>
+<td align="right">6.0</td>
+</tr>
+<tr>
+<td>op.Equal.equTerm(Term, Term)</td>
+<td>12.0</td>
+<td>2.0</td>
+<td>4.0</td>
+<td align="right">6.0</td>
+</tr>
+<tr>
+<td>op.Mergeplus.merpExpr(Expr)</td>
+<td>12.0</td>
+<td>4.0</td>
+<td>6.0</td>
+<td align="right">6.0</td>
+</tr>
+<tr>
+<td>readin.Parser.parsePow()</td>
+<td>12.0</td>
+<td>8.0</td>
+<td>11.0</td>
+<td align="right">11.0</td>
+</tr>
+<tr>
+<td>op.Equal.equExpr(Expr, Expr)</td>
+<td>11.0</td>
+<td>2.0</td>
+<td>4.0</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td>op.Plugin.funcStr(Func)</td>
+<td>11.0</td>
+<td>1.0</td>
+<td>10.0</td>
+<td align="right">10.0</td>
+</tr>
+<tr>
+<td>op.Equal.canMergePow(Pow, Pow)</td>
+<td>9.0</td>
+<td>5.0</td>
+<td>9.0</td>
+<td align="right">9.0</td>
+</tr>
+<tr>
+<td>op.Expand.expandTerm(Term)</td>
+<td>9.0</td>
+<td>1.0</td>
+<td>9.0</td>
+<td align="right">9.0</td>
+</tr>
+<tr>
+<td>op.Mergemult.mermTerm(Term)</td>
+<td>9.0</td>
+<td>4.0</td>
+<td>5.0</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td>expr.Expr.multExpr(Expr)</td>
+<td>8.0</td>
+<td>3.0</td>
+<td>5.0</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td>readin.Parser.parseExpr()</td>
+<td>7.0</td>
+<td>1.0</td>
+<td>7.0</td>
+<td align="right">7.0</td>
+</tr>
+<tr>
+<td>op.Lowpow.lowPow(Pow)</td>
+<td>6.0</td>
+<td>1.0</td>
+<td>5.0</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td>op.Plugin.plugPow(Pow)</td>
+<td>6.0</td>
+<td>6.0</td>
+<td>6.0</td>
+<td align="right">6.0</td>
+</tr>
+<tr>
+<td>expr.Cos.toString()</td>
+<td>5.0</td>
+<td>3.0</td>
+<td>2.0</td>
+<td align="right">3.0</td>
+</tr>
+<tr>
+<td>expr.Expr.toString()</td>
+<td>5.0</td>
+<td>1.0</td>
+<td>4.0</td>
+<td align="right">4.0</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td align="right">…</td>
+</tr>
+<tr>
+<td>op.Plugin.plugFunc(Func)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td>op.Plugin.plugSum(Sum)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td>readin.Lexer.Lexer(String)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td>readin.Lexer.peek()</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td>readin.Parser.Parser(Lexer)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td>readin.SimplyIn.simplyIn(String)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>244.0</td>
+<td>127.0</td>
+<td>219.0</td>
+<td align="right">240.0</td>
+</tr>
+<tr>
+<td><strong>Average</strong></td>
+<td><strong>2.90</strong></td>
+<td><strong>1.51</strong></td>
+<td><strong>2.61</strong></td>
+<td align="right"><strong>2.86</strong></td>
+</tr>
+</tbody></table>
+<p>从类方法度量的角度看，这份代码的整体复杂度还算适中，但是在一些方法中出现了复杂度过高的现象，这种现象主要源自于两个原因——①代码面向过程痕迹严重：例如parseVars方法，是利用括号匹配的规则对自定义函数进行因子的提取，而事实证明这种面向对象的代码也容易出bug；②使用过多分支语句：由于我几乎所有表达式类均实现了Factor接口，所以在因子层面往往需要利用许多分支语句对具体操作进行分类，使得分支变多，方法整体也较为臃肿。但是从另一方面说，正是由于我对处理的每一个步骤都实现了单独的类，所以整体的耦合性低，整体复杂度还是较低的。</p>
+<h2 id="bug分析与测试"><a href="#bug分析与测试" class="headerlink" title="bug分析与测试"></a>bug分析与测试</h2><h3 id="出现的bug"><a href="#出现的bug" class="headerlink" title="出现的bug"></a>出现的bug</h3><p>本单元的作业出现的bug主要有：第二次作业在递归解析时返回了错误的对象（例如应该返回数字对象却返回幂对象）；第三次作业出现的大整数问题；第三次作业出现的括号匹配问题；第三次作业出现的输出格式错误问题。</p>
+<p>对问题进行回溯，可以很清楚的看出，错误代码正是出现在①代码分支较多处，导致返回对象混淆；②面向过程的复杂代码处，导致考虑问题步骤。所以可以看出代码复杂度与bug出现的难易度确实呈现一定程度上的正相关关系，在初步设计是就应该注意控制代码复杂度。</p>
+<h3 id="分析bug策略"><a href="#分析bug策略" class="headerlink" title="分析bug策略"></a>分析bug策略</h3><p>分析bug主要策略有三：一是针对每次作业的增量开发部分进行定点测试，分析是否实现了功能的增量，例如函数嵌套等；二是测试边界数据，例如大整数数据，边界次幂数据等；第三则是利用自动评测数据（这里感谢hxy同学提供的自动测试程序帮我测出了程序的许多问题），对有问题数据进行简化与问题定位。</p>
+<h2 id="心得体会"><a href="#心得体会" class="headerlink" title="心得体会"></a>心得体会</h2><ul>
+<li>好架构的重要性：在第一次作业的过程中，由于没有进行整体设计，所以我对自己的代码熟悉度不是很高，这直接导致了我第二次作业的重构；而第二次作业的整体设计和未来增量设想，反而为我第三次作业代码的编写提供了便利，这种对比让我确定了好架构的优势。</li>
+<li>面向对象思想初探：回过头来看我的代码结构，不能说不好，但是也不能说完全符合面向对象要求，例如前文多次强调的实现接口问题。但是在设计过程中，我确实尝试采用荣文戈老师所说：<em>“假设你有很多程序员，将任务分出去”</em>的想法，这样的想法带给我的好处就是任务分得清，降低了整体代码的耦合度，这确实降低了我debug的难度。</li>
+<li>学习是一个合作的过程：在开发过程中，我针对题目具体要求和同学进行了反复讨论，针对一些具体的技术问题也对同学进行了讨教，更别说从同学处获得了自动测试的程序，这些都使我的开发变得更为容易和清晰，可以体会到合作在代码开发过程中的重要性。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/15/%E3%80%90C++%E3%80%9102-C++-%E5%AE%B9%E5%99%A8(1)-vector/" rel="prev" title="【C++】02 C++ 容器(1) vector">
+      <i class="fa fa-chevron-left"></i> 【C++】02 C++ 容器(1) vector
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E6%80%9D%E8%B7%AF"><span class="nav-number">1.</span> <span class="nav-text">架构思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E4%B8%9A%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">作业概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-number">1.2.</span> <span class="nav-text">整体思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E4%BC%98%E5%8A%A3%E5%88%86%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">设计优劣分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84%E5%BA%A6%E9%87%8F"><span class="nav-number">2.</span> <span class="nav-text">程序结构度量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UML%E7%B1%BB%E5%9B%BE"><span class="nav-number">2.1.</span> <span class="nav-text">UML类图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E6%96%B9%E6%B3%95%E5%BA%A6%E9%87%8F"><span class="nav-number">2.2.</span> <span class="nav-text">类方法度量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bug%E5%88%86%E6%9E%90%E4%B8%8E%E6%B5%8B%E8%AF%95"><span class="nav-number">3.</span> <span class="nav-text">bug分析与测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BA%E7%8E%B0%E7%9A%84bug"><span class="nav-number">3.1.</span> <span class="nav-text">出现的bug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90bug%E7%AD%96%E7%95%A5"><span class="nav-number">3.2.</span> <span class="nav-text">分析bug策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%83%E5%BE%97%E4%BD%93%E4%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">心得体会</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hz Xie"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Hz Xie</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hz Xie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
