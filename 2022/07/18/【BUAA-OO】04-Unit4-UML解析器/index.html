@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本单元要实现一个UML解析器。具体来说，本单元作业需要继承官方接口UserApi，在自己实现的MyUserApi类中实现对应方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【BUAA-OO】04 Unit4 UML解析器">
+<meta property="og:url" content="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9104-Unit4-UML%E8%A7%A3%E6%9E%90%E5%99%A8/index.html">
+<meta property="og:site_name" content="LeVoyageur">
+<meta property="og:description" content="本单元要实现一个UML解析器。具体来说，本单元作业需要继承官方接口UserApi，在自己实现的MyUserApi类中实现对应方法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework15.png">
+<meta property="article:published_time" content="2022-07-18T04:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-18T03:27:15.462Z">
+<meta property="article:author" content="Hz Xie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework15.png">
+
+<link rel="canonical" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9104-Unit4-UML%E8%A7%A3%E6%9E%90%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【BUAA-OO】04 Unit4 UML解析器 | LeVoyageur</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LeVoyageur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9104-Unit4-UML%E8%A7%A3%E6%9E%90%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Hz Xie">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LeVoyageur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【BUAA-OO】04 Unit4 UML解析器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-18 12:00:00 / 修改时间：11:27:15" itemprop="dateCreated datePublished" datetime="2022-07-18T12:00:00+08:00">2022-07-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BUAA-OO/" itemprop="url" rel="index"><span itemprop="name">BUAA-OO</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本单元要实现一个UML解析器。具体来说，本单元作业需要继承官方接口<code>UserApi</code>，在自己实现的<code>MyUserApi</code>类中实现对应方法。</p>
+<span id="more"></span>
+
+<h2 id="UML解析器架构分析"><a href="#UML解析器架构分析" class="headerlink" title="UML解析器架构分析"></a>UML解析器架构分析</h2><h3 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h3><p>本单元要实现一个UML解析器。具体来说，本单元作业需要继承官方接口<code>UserApi</code>，在自己实现的<code>MyUserApi</code>类中实现对应方法。更进一步，本单元作业要在<code>MyUserApi</code>类的构造方法中实现对UML图形的层次化建模（包含类图、顺序图和状态图三个部分）；之后通过官方提供的对应UML元素类实现自己的UML元素类，在各个元素类中完成官方接口定义的查询方法；在最后要实现模型有效性检查类，从而在层次化建模完成后对整体UML图模型进行检查，排除不合法的模型。整体设计架构如下图所示。</p>
+<h3 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h3><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework15.png" alt="oo_homework15"></p>
+<h3 id="架构分析"><a href="#架构分析" class="headerlink" title="架构分析"></a>架构分析</h3><h4 id="层次化建模"><a href="#层次化建模" class="headerlink" title="层次化建模"></a>层次化建模</h4><p>由于UML模型图的输入是乱序的，为了保证层次化建模，需要对输入的UML模型进行多轮遍历，具体如下：</p>
+<p>Round 1:</p>
+<ul>
+<li>类图：<code>UmlClass</code>, <code>UmlInterface</code>;</li>
+<li>顺序图：<code>UmlInteraction</code>;</li>
+<li>状态图：<code>UmlStateMachine</code>;</li>
+</ul>
+<p>Round 2: </p>
+<ul>
+<li>类图：<code>UmlAttribute</code>（同属顺序图）, <code>UmlOperation</code>, <code>UmlGeneralization</code>, <code>UmlInterfaceRealization</code>, <code>UmlAssociationEnd</code>;</li>
+<li>顺序图：<code>UmlLifeline</code>, <code>UmlEndpoint</code>;</li>
+<li>状态图：<code>UmlRegion</code>;</li>
+</ul>
+<p>Round 3:</p>
+<ul>
+<li>类图：<code>UmlParameter</code>, <code>UmlAssociation</code>;</li>
+<li>顺序图：<code>UmlMessage</code>;</li>
+<li>状态图：<code>UmlState</code>, <code>UmlPseudostate</code>, <code>UmlFinalState</code>;</li>
+</ul>
+<p>Round 4:</p>
+<ul>
+<li>状态图：<code>UmlTransition</code>;</li>
+</ul>
+<p>Round 5:</p>
+<ul>
+<li>状态图：<code>UmlEvent</code>。</li>
+</ul>
+<p>综合层次化要求和代码复杂性后，具体的层次设计主要采取两层结构，包含：</p>
+<ul>
+<li><code>MyClass</code>—<code>MyOperation</code></li>
+<li><code>MyInterface</code></li>
+<li><code>MyInteraction</code>—<code>MyLifeline</code></li>
+<li><code>MyRegion</code>—<code>MyState</code>（<code>MyStateMachine</code>只充当<code>MyRegion</code>类的外壳的作用，严格意义上不是一个层次）。</li>
+</ul>
+<p>具体的层次化建模封装到了<code>parse*</code>方法中。</p>
+<h4 id="查询方法设计步骤"><a href="#查询方法设计步骤" class="headerlink" title="查询方法设计步骤"></a>查询方法设计步骤</h4><p>事实上，在一个合理的层次化建模总体模型下（特别考虑到本单元作业对性能几乎没有要求，所以可以使用最简单的代码逻辑），实现每一个接口待实现的查询方法只是时间问题。总体来说包含如下步骤：</p>
+<ol>
+<li><p>抛出存在性异常。</p>
+<p>在我们建立的层次化模型中，同名同姓的类图&#x2F;顺序图&#x2F;状态图元素是完全可能存在的，此时需要抛出所谓的存在性异常（包含不存在异常+存在多个异常）。由于基本上所有方法都需要进行存在性异常的检查，所以将这个过程封装为一个方法，即<code>MyUserApi</code>类中的<code>throw*Exception</code>方法；</p>
+</li>
+<li><p>提供查询方法接口。</p>
+<p>在<code>MyUserApi</code>类中提供方法接口，调用具体类中的查询方法；</p>
+</li>
+<li><p>递归下降实现查询方法。</p>
+</li>
+</ol>
+<h4 id="模型有效性检查"><a href="#模型有效性检查" class="headerlink" title="模型有效性检查"></a>模型有效性检查</h4><p>在本单元的最后一次作业中，我们需要实现模型的有效性检查。实现过程其实和具体的查询方法类似，但是考虑到代码风格的需求，本次作业将有效性检查封装成了一个具体的<code>MyUmlStandardPreCheck</code>类，并在类中实现相应的静态方法；通过在<code>MyUserApi</code>中传入具体的模型参数并向<code>MyUserApi</code>提供调用静态方法的接口，实现两个类的交互。</p>
+<h3 id="架构改进想法"><a href="#架构改进想法" class="headerlink" title="架构改进想法"></a>架构改进想法</h3><p>在绘制本单元作业的架构图，特别是其中<code>MyUserApi</code>部分时，我曾一度想放弃罗列所有的方法，因为类中方法太多了。但是仔细想想，完整的绘制或许可以提醒我一个基本事实：不合理的架构设计会导致代码臃肿。事实上，本单元的架构完全可以有进一步的改进，主要包含以下方面：</p>
+<ol>
+<li>建模与查询相分离。本单元作业的建模和查询事实上是基本独立开的，完全可以另外实现一个建模类进行层次化建模，实现建模方法的封装；</li>
+<li>设计类的组合、继承关系。在本次作业中，我主要使用组合+方法接口的方式实现具体查询方法，这就要求在<code>MyUserApi</code>类中要提供具体的方法接口，还是会导致方法过多的问题。事实上，官方接口已经对此做出提示：可以划分类图&#x2F;顺序图&#x2F;状态图的不同查询需求，通过继承关系统一联系到<code>MyUserApi</code>中。</li>
+</ol>
+<h2 id="架构设计思维与OO方法理解演进"><a href="#架构设计思维与OO方法理解演进" class="headerlink" title="架构设计思维与OO方法理解演进"></a>架构设计思维与OO方法理解演进</h2><h3 id="层次化建模-1"><a href="#层次化建模-1" class="headerlink" title="层次化建模"></a>层次化建模</h3><p>在第一单元中，我们通过表达式解析任务初步了解OO的基础——<strong>类的封装性</strong>。具体来说，我们通过对每个表达式层次对象进行封装，设计具体的成员属性和成员方法，最终实现了表达式解析任务。</p>
+<p>再回过头来看我的代码结构，不能说不好，但是也不能说完全符合面向对象要求，例如实现接口还是设计类的问题。但是在设计过程中，我确实尝试采用荣文戈老师所说：<em><strong>“假设你有很多程序员，将任务分出去”</strong></em>的想法，这样的想法带给我的好处就是任务分得清，降低了整体代码的耦合度，这确实降低了我debug的难度。</p>
+<h3 id="多线程设计"><a href="#多线程设计" class="headerlink" title="多线程设计"></a>多线程设计</h3><p>在第二单元中，我们通过多线程电梯调度的任务初步了解了Java多线程的知识。具体来说，我们通过继承<code>Thread</code>类来实现线程，通过<code>synchronized</code>关键字保证线程的互斥，并且通过<code>wait</code>-<code>notify</code>方法对实现线程的同步。</p>
+<p>在整体架构的设计上，本单元我们接触了<strong>生产者-消费者模型</strong>，实现了基本的线程间信息的传递；在架构设计上我还采用了<strong>组合等类的联系</strong>，使得整体架构更加便于管理。</p>
+<h3 id="规格化设计"><a href="#规格化设计" class="headerlink" title="规格化设计"></a>规格化设计</h3><p>在第三单元中，我们通过社交图网络的任务初步了解了JML规格设计的知识。具体来说，我们通过官方提供的方法接口及其JML描述，实现自己的类与方法，总体来说是一个<strong>阅读契约-理解契约-实现契约</strong>的整体过程，这也在OO方法上给了我更高层次的提示——设计并不仅仅是类之间功能的协作，更是需求同实现的协作，这里的协作是需要严格规约的。</p>
+<p>在架构设计上，本单元的作业我尽力将架构封装为<strong>实际结构层-抽象结构层-算法层</strong>三个层次，并在设计过程中尽力实现<strong>软件设计原则</strong>（如开闭原则、单一职责原则、里氏替换原则）等，使得架构设计思想向更抽象的层次进一步。</p>
+<h3 id="面向对象基础——UML"><a href="#面向对象基础——UML" class="headerlink" title="面向对象基础——UML"></a>面向对象基础——UML</h3><p>最后一单元，我们通过UML解析器的实现回顾面向对象最重要描述语言——UML的相关知识。总的来说，这和第一单元涉及的层次化设计思想是类似的，但不同于第一单元的是，我已经可以灵活掌握继承、组合、关联等类的不同关系，从而实现更加合理的架构。这也许就是架构思维提升的体现。</p>
+<h2 id="测试理解与实践演进"><a href="#测试理解与实践演进" class="headerlink" title="测试理解与实践演进"></a>测试理解与实践演进</h2><p>测试是OO课程中一个重要的环节。在四个单元OO的学习过程中，我实现了不测试—测试调试—手动构造数据的演进，一步步加深了对程序正确性的保证。</p>
+<p>第一单元与第二单元的第一次作业中，我基本上采取<strong>鸵鸟策略</strong>，由于本身对Java语言就不是很熟悉，完成作业已经使我有些心力交猝，所以就不测试，逃避测试，等待强测与互测错了再修bug。直到第二单元的第一次作业，一个小小的for循环迭代的细节让我挂了几乎八成的测试点，我意识到鸵鸟策略或许是不应该的。所以第二步，我开始漫长的<strong>合作测试</strong>道路（但是其实是单方面的合作，即使用他人的评测机跑自己的程序，然后根据错误调试）。尽管测试的自主性有待质疑，但是不得不说，我在一步步debug的过程中逐渐锻炼了自己定位错误与修正的能力，程序的正确性有了较高的保障。但是老话说得好，打铁还需自身硬，在第三单元中，我面向性能测试尝试进行<strong>手动构造数据</strong>，并且在三次作业的互测中都进行了成功hack。这其中的喜悦确实是不一般的。</p>
+<p>但是我也深知，对于自动化测试我还基本未涉足，正好暑假有Python课程，看看能不能在语言学习后尝试自主构造测评机，以弥补测试中这巨大的遗憾。</p>
+<h2 id="课程收获"><a href="#课程收获" class="headerlink" title="课程收获"></a>课程收获</h2><p>总的来说，OO给我的收获是很多的，包括但不限于以下内容：</p>
+<ol>
+<li>Java基础语法；</li>
+<li>多线程编程知识；</li>
+<li>JML规格化语言的阅读和撰写；</li>
+<li>UML类图、顺序图和状态图的相关知识；</li>
+<li>软件设计六大基本原则；</li>
+<li>单例模式、策略模式等设计模式；</li>
+<li>层次化分析等架构设计思想；</li>
+<li>若干不眠之夜与对身体健康的反思（bushi</li>
+<li>…</li>
+</ol>
+<p>回首整门课，可以说是在暂时上的课中对我代码能力提升作用最大的一节课，希望我能够将这些内容好好消化吸收，用到未来自己的其他科目学习和工作当中。</p>
+<h2 id="课程改进建议"><a href="#课程改进建议" class="headerlink" title="课程改进建议"></a>课程改进建议</h2><ol>
+<li>预习课程可以适当分配课时（例如两周，可以把JML和UML的课时适当压缩），同时设置一定分值，push同学去完成预习课程，从而更好进行正课学习；</li>
+<li>可以在指导书中多一些设计模式的提示；</li>
+<li>实验课课前给一些提示或者相关知识的学习，并且在课后开放答案反馈和修正机会。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/18/%E3%80%90BUAA-OO%E3%80%9103-Unit3-%E7%A4%BE%E4%BA%A4%E5%9B%BE%E7%BD%91%E7%BB%9C/" rel="prev" title="【BUAA-OO】03 Unit3 社交图网络">
+      <i class="fa fa-chevron-left"></i> 【BUAA-OO】03 Unit3 社交图网络
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#UML%E8%A7%A3%E6%9E%90%E5%99%A8%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">UML解析器架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E5%8C%96%E5%BB%BA%E6%A8%A1"><span class="nav-number">1.3.1.</span> <span class="nav-text">层次化建模</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%96%B9%E6%B3%95%E8%AE%BE%E8%AE%A1%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.3.2.</span> <span class="nav-text">查询方法设计步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E6%9C%89%E6%95%88%E6%80%A7%E6%A3%80%E6%9F%A5"><span class="nav-number">1.3.3.</span> <span class="nav-text">模型有效性检查</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E6%94%B9%E8%BF%9B%E6%83%B3%E6%B3%95"><span class="nav-number">1.4.</span> <span class="nav-text">架构改进想法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%80%9D%E7%BB%B4%E4%B8%8EOO%E6%96%B9%E6%B3%95%E7%90%86%E8%A7%A3%E6%BC%94%E8%BF%9B"><span class="nav-number">2.</span> <span class="nav-text">架构设计思维与OO方法理解演进</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E5%8C%96%E5%BB%BA%E6%A8%A1-1"><span class="nav-number">2.1.</span> <span class="nav-text">层次化建模</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.2.</span> <span class="nav-text">多线程设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%84%E6%A0%BC%E5%8C%96%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.3.</span> <span class="nav-text">规格化设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%9F%BA%E7%A1%80%E2%80%94%E2%80%94UML"><span class="nav-number">2.4.</span> <span class="nav-text">面向对象基础——UML</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5%E6%BC%94%E8%BF%9B"><span class="nav-number">3.</span> <span class="nav-text">测试理解与实践演进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E6%94%B6%E8%8E%B7"><span class="nav-number">4.</span> <span class="nav-text">课程收获</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E6%94%B9%E8%BF%9B%E5%BB%BA%E8%AE%AE"><span class="nav-number">5.</span> <span class="nav-text">课程改进建议</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hz Xie"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Hz Xie</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hz Xie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
