@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本单元作业需要完成多线程的电梯调度程序。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【BUAA-OO】02 Unit2 多线程电梯">
+<meta property="og:url" content="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9102-Unit2-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%94%B5%E6%A2%AF/index.html">
+<meta property="og:site_name" content="LeVoyageur">
+<meta property="og:description" content="本单元作业需要完成多线程的电梯调度程序。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework5.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework5_sequence.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework6_sequence.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework7.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework7_sequence.png">
+<meta property="article:published_time" content="2022-07-18T03:40:00.000Z">
+<meta property="article:modified_time" content="2022-07-18T03:11:09.305Z">
+<meta property="article:author" content="Hz Xie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework5.png">
+
+<link rel="canonical" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9102-Unit2-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%94%B5%E6%A2%AF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【BUAA-OO】02 Unit2 多线程电梯 | LeVoyageur</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LeVoyageur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9102-Unit2-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%94%B5%E6%A2%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Hz Xie">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LeVoyageur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【BUAA-OO】02 Unit2 多线程电梯
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-18 11:40:00 / 修改时间：11:11:09" itemprop="dateCreated datePublished" datetime="2022-07-18T11:40:00+08:00">2022-07-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BUAA-OO/" itemprop="url" rel="index"><span itemprop="name">BUAA-OO</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本单元作业需要完成多线程的电梯调度程序。</p>
+<span id="more"></span>
+
+<h2 id="电梯架构分析"><a href="#电梯架构分析" class="headerlink" title="电梯架构分析"></a>电梯架构分析</h2><h3 id="第五次作业"><a href="#第五次作业" class="headerlink" title="第五次作业"></a>第五次作业</h3><h4 id="整体架构分析"><a href="#整体架构分析" class="headerlink" title="整体架构分析"></a>整体架构分析</h4><h5 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h5><p>本单元作业需要完成多线程的电梯调度程序，而本次作业仅需要支持上下行一种电梯和同座间换层指令的需求。</p>
+<h5 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h5><p>本次作业采取输入线程和电梯线程两个线程，其中输入线程负责从控制台获得指令并分配到各个指令队列中，电梯线程则负责从指令队列中获得指令并控制电梯的运行。整体采用生产者-消费者模型进行架构，其中输入线程是指令的生产者，电梯线程是指令的消费者。程序整体的UML类图如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework5.png" alt="oo_unit2_homework5"></p>
+<p>类的具体分析如下</p>
+<ol>
+<li><p>MainClass</p>
+<p>主类负责启动输入线程和电梯线程，同时创建所有电梯的请求队列传入电梯，并将所有请求队列形成的集合传入输出线程，从而构建输入线程和电梯线程的数据共享关系。</p>
+</li>
+<li><p>InputThread</p>
+<p>输入类继承Thread类，作为输入线程。该类从课程组提供的输入包中获取请求，并根据请求的信息将请求分配到不同电梯的请求队列中，起到调度的作用。</p>
+</li>
+<li><p>RequestQueue</p>
+<p>请求队列类，负责存放每个请求的集合并存储请求队列是否输入结束的信息。由于该类是两个核心线程的共享数据对象，所以其中的方法基本都进行加锁。</p>
+</li>
+<li><p>Elevator</p>
+<p>电梯类继承Thread类，作为电梯线程。该类进行请求处理与信息输出工作，具体调度策略见后文分析。</p>
+</li>
+<li><p>OutputThread</p>
+<p>输出类，里面只有一个静态方法，通过静态方法的加锁保证输出信息的线程安全。</p>
+</li>
+</ol>
+<h5 id="调度策略"><a href="#调度策略" class="headerlink" title="调度策略"></a>调度策略</h5><p>本次作业的电梯采用scan策略（虽然方法中写的是look），具体调度策略如下：</p>
+<ol>
+<li>当电梯的请求队列为空时等待；</li>
+<li>当请求队列非空时开始运行，运行方向为请求队列中首个请求的方向；</li>
+<li>电梯开始运行后无条件捎带（即当前层有请求方向与运行方向相同的请求就带上）；</li>
+<li>电梯送完乘客后会继续运行至顶层&#x2F;底层才调转方向。</li>
+</ol>
+<h4 id="调度器设计"><a href="#调度器设计" class="headerlink" title="调度器设计"></a>调度器设计</h4><p>本次作业没有单独设计调度器，指令的分发由输入线程InputThread负责。其中指令通过传入InputThread的请求队列集合进行分发，该线程通过获取请求的getFromBuilding来判断将请求放入哪一个请求队列，从而直接实现不同请求的分配。</p>
+<h4 id="线程协作关系"><a href="#线程协作关系" class="headerlink" title="线程协作关系"></a>线程协作关系</h4><p>类协作的时序图如下</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework5_sequence.png" alt="oo_homework5_sequence"></p>
+<p>总体来说，MainClass类负责将共享数据区域进行创建与传递；InputThread线程负责传递请求给RequestQueue类，并向RequestQueue传递结束信息；RequestQueue类负责将请求交给电梯处理；最后所有电梯线程结束后通知主线程结束。</p>
+<h3 id="第六次作业"><a href="#第六次作业" class="headerlink" title="第六次作业"></a>第六次作业</h3><h4 id="整体架构分析-1"><a href="#整体架构分析-1" class="headerlink" title="整体架构分析"></a>整体架构分析</h4><h5 id="需求分析-1"><a href="#需求分析-1" class="headerlink" title="需求分析"></a>需求分析</h5><p>本次作业新增两个需求。</p>
+<p>①增加横向电梯，并增加相应的横向移动请求；</p>
+<p>②增加创建电梯的请求，即在一层&#x2F;一座上可能出现多部电梯。</p>
+<h5 id="整体架构-1"><a href="#整体架构-1" class="headerlink" title="整体架构"></a>整体架构</h5><p>本次作业采取输入线程、调度器线程和电梯线程三个线程。新增调度器线程的考量是增加了创建电梯的请求，若还是集中在InputThread线程中处理，超出了所谓“Input”的职责范围。整体还是采用生产者-消费者模型，对于InputThread-Scheduler而言，InputThread是生产者，Scheduler是消费者；而Scheduler对请求进行分发后，则在Scheduler-Elevator之间形成了“一生产者，多消费者”模型。程序整体的UML类图如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework6.png" alt="oo_unit2_homework6"></p>
+<p>类的具体迭代分析如下</p>
+<ol>
+<li><p>MainClass</p>
+<p>在主类中增加了启动Scheduler线程的语句，在InputThread-Scheduler之间放入一个单独队列作为共享数据对象。</p>
+</li>
+<li><p>InputThread</p>
+<p>将调度的工作交出，只负责往单一的请求队列waitQueue中添加请求。</p>
+</li>
+<li><p>Scheduler</p>
+<p>负责请求的调度。若获得的请求为电梯请求，则启动该电梯线程；若获得的请求为人的请求，则根据请求种类（楼层还是楼座）与请求位置进行请求的分配。</p>
+</li>
+<li><p>RequestQueue</p>
+<p>对于提高性能的需求增加sortRequests方法，对于请求队列中的请求按照到达距离的远近进行排序。</p>
+</li>
+<li><p>Elevator</p>
+<p>本单元作业没有将横向电梯与纵向电梯共同继承于一个总的电梯类。（不得不承认这是我在面向对象设计的一个缺陷）故对于横向电梯，类中另外实现了一套横向电梯的相关方法进行横向电梯的运行。</p>
+</li>
+</ol>
+<h5 id="调度策略-1"><a href="#调度策略-1" class="headerlink" title="调度策略"></a>调度策略</h5><p>本次请求的调度策略分为两个方面：多电梯分配策略于单电梯调度策略。</p>
+<ul>
+<li><p>多电梯分配策略</p>
+<p>参考往届学长学姐的博客发现多电梯之间自由竞争可以得到较好的性能，故多电梯分配采用简单的自由竞争方式。宏观来看，自由竞争就是所用同层&#x2F;同座的电梯采用一个共享的请求队列，所有电梯共同接收请求队列中的信息；而谁获得请求队列中请求的接送权完全交给程序选择，哪个电梯线程在竞争中先进入临界区，哪个电梯线程就获得该请求。（其他电梯线程好像是白跑了，但是由于自由竞争电梯不断运动可能反而能更快捎上请求，所以自由竞争能获得较好性能）</p>
+</li>
+<li><p>单电梯调度策略</p>
+<p>本次单个电梯采用的调度策略为look策略，具体调度策略如下：</p>
+<ol>
+<li>电梯采用无条件捎带策略；</li>
+<li>若电梯里有请求，则电梯里的请求先送，电梯运行方向就为电梯中请求的方向；</li>
+<li>若电梯中请求送完，则先看看有没有同向可接（与电梯刚刚运行方向相同）请求，有的话电梯同向运行；</li>
+<li>若无同向请求，则看看有没有反向可接请求，有的话电梯立马转向运行；</li>
+<li>若请求队列为空，则电梯运行方向设为0，停止运行。</li>
+</ol>
+</li>
+</ul>
+<h4 id="调度器设计-1"><a href="#调度器设计-1" class="headerlink" title="调度器设计"></a>调度器设计</h4><p>本次作业单独实现了调度器类。该调度器拥有两个共享数据对象的访问权限：一个是waitQueue，负责接收来自InputThread的请求；另一个是电梯的personQueues，负责向电梯线程传递请求。而调度器的作用就是将来自第一个共享数据空间的请求分配到第二个共享数据空间中，具体调度通过判断请求种类（电梯请求或人的请求）和请求信息（请求的楼层楼座信息）实现。</p>
+<h4 id="线程协作关系-1"><a href="#线程协作关系-1" class="headerlink" title="线程协作关系"></a>线程协作关系</h4><p>类协作的时序图如下。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework6_sequence.png" alt="oo_homework6_sequence"></p>
+<p>本次类协作关系的改变主要来自于Scheduler类的增加。该类获得来自InputThread的请求后，负责新电梯线程的创建和请求的分发；其余类的协作关系基本保持不变。</p>
+<h3 id="第七次作业"><a href="#第七次作业" class="headerlink" title="第七次作业"></a>第七次作业</h3><h4 id="整体架构分析-2"><a href="#整体架构分析-2" class="headerlink" title="整体架构分析"></a>整体架构分析</h4><h5 id="需求分析-2"><a href="#需求分析-2" class="headerlink" title="需求分析"></a>需求分析</h5><p>本次作业新增两个需求。</p>
+<p>①增加电梯可定制需求，最重要的定制需求为横向电梯可达楼座的定制；</p>
+<p>②放开请求限制，需要支持到不同层不同座的乘坐请求。</p>
+<h5 id="整体架构-2"><a href="#整体架构-2" class="headerlink" title="整体架构"></a>整体架构</h5><p>整体同样设置三个线程，线程之间的关系也基本不变，增加ElevatorSet类对要换乘需求进行处理。程序UML类图如下。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_unit2_homework7.png" alt="oo_unit2_homework7"></p>
+<p>类的具体迭代分析如下</p>
+<ol>
+<li><p>MainClass</p>
+<p>在主类中增加创建ElevatorSet对象的语句，并将该对象传入Scheduler类和Elevator类中，辅助这两个类进行线程结束的判断和请求的传递。</p>
+</li>
+<li><p>Scheduler</p>
+<p>修改了判断请求队列结束的条件，具体修改逻辑见调度策略与调度器设计部分。</p>
+</li>
+<li><p>Elevator</p>
+<p>在构造方法中传入waitQueue这一共享数据对象，增加在电梯出人时将未送完请求传递给waitQueue的功能。</p>
+</li>
+<li><p>ElevatorSet</p>
+<p>主要负责两件工作：一件工作是根据已经送到的请求和总请求生成待送请求的功能；二是维护一个全局的stage变量，该变量表示输入线程生成的所有请求的总的处理阶段数（每个请求的处理阶段数含义见调度策略与调度器设计部分），可以用于判断电梯队列是否结束。</p>
+</li>
+</ol>
+<h5 id="调度策略-2"><a href="#调度策略-2" class="headerlink" title="调度策略"></a>调度策略</h5><p>本次作业需要额外设计的调度策略为请求的拆分策略。综合考虑实现的复杂度和性能后，本次作业采用的请求拆分策略为在指令一输入就进行拆分，拆分形成的执行阶段称为请求的处理阶段，具体拆分策略如下：</p>
+<ol>
+<li>判断请求是否需要换乘。若不需要换乘则不拆分，并将请求处理阶段stage设为1；</li>
+<li>判断请求的起始层&#x2F;到达层上有没有满足连通需求的横向电梯，若有则将请求处理阶段设为2；</li>
+<li>否则请求的处理阶段设为3。</li>
+<li>请求具体的拆分方式为分为需要执行的请求nowRequest和执行完nowRequest后剩余的请求nextRequest两部分；而中转电梯的选择采取官方策略，本质思想就是换乘的距离越短越好。</li>
+</ol>
+<h4 id="调度器设计-2"><a href="#调度器设计-2" class="headerlink" title="调度器设计"></a>调度器设计</h4><p>本次作业调度器Scheduler的增量开发有两个：一个是增加了请求队列的数据来源；第二个是修改了结束请求队列的逻辑。</p>
+<p>首先是请求队列数据来源的增加。在上次作业中，waitQueue这一共享数据对象的生产者只有InputThread，这次的生产者还有Elevator，各个Elevator将还没有送完的请求通过ElevatorSet类生成MyRequest，再送入Scheduler进行分配；</p>
+<p>其次是修改了结束请求队列的逻辑。由于请求队列数据来源的增加，本次作业通过统计所有来自InputThread请求的处理阶段总数来判断是否结束请求队列。当该总数为0时代表所有请求处理完毕，此时可以正常结束请求队列。</p>
+<h4 id="线程协作关系-2"><a href="#线程协作关系-2" class="headerlink" title="线程协作关系"></a>线程协作关系</h4><p>类协作的时序图如下。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework7_sequence.png" alt="oo_homework7_sequence"></p>
+<p>本次类协作关系的改变主要来自于ElevatorSet类的增加，总的来说ElevatorSet类接受完成了部分阶段的请求，返回一个待完成请求；同时维护一个全局stage信息，从而可以通知Scheduler类结束线程。</p>
+<h2 id="同步块与锁的设计"><a href="#同步块与锁的设计" class="headerlink" title="同步块与锁的设计"></a>同步块与锁的设计</h2><h3 id="锁的设计"><a href="#锁的设计" class="headerlink" title="锁的设计"></a>锁的设计</h3><p>本单元的作业主要通过两种方式上锁：方法锁与代码块锁。锁的设置采用了“有共享数据就加锁”的原则，做到了访问上的绝对安全。具体上锁代码举例如下。</p>
+<ol>
+<li><p>方法锁。</p>
+<p>对于此次作业，共享数据对象总是由RequestQueue类生成，故在该类的所有方法基本都进行上锁，例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> requests.isEmpty();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>代码块锁。</p>
+<p>在电梯线程中有频繁的对RequestQueue对象的操作，故涉及该对象的操作外同样套锁，例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span> (personQueue) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; personQueue.getSize(); i++) &#123;</span><br><span class="line">        <span class="type">MyRequest</span> <span class="variable">request</span> <span class="operator">=</span> (MyRequest) personQueue.getRequests().get(i);</span><br><span class="line">        <span class="type">int</span> <span class="variable">reqMask</span> <span class="operator">=</span> request.getRequestMask();</span><br><span class="line">        <span class="keyword">if</span> ((lrreqDirection(request) == direction || direction == <span class="number">0</span>) &amp;&amp; personNum &lt; capacity</span><br><span class="line">            &amp;&amp; request.getFromBuilding() == building &amp;&amp; (mask &amp; reqMask) == reqMask) &#123;</span><br><span class="line">            inQueue.add((MyRequest) personQueue.getRequest(i));</span><br><span class="line">            i--;</span><br><span class="line">            processQueue.add(request);</span><br><span class="line">            personNum++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>在设计时为了保证绝对的互斥访问，本次作业我在所有涉及共享对象的地方都加上了锁，但我深知这样的设计是冗余的，会影响线程并发的性能；而且未能尝试使用更为高效的读写锁，也是本次作业的一大遗憾。</p>
+<h3 id="线程休眠与唤醒"><a href="#线程休眠与唤醒" class="headerlink" title="线程休眠与唤醒"></a>线程休眠与唤醒</h3><p>除了线程互斥的处理，共享数据对象的线程还包含线程同步的处理。所谓的同步，就是线程按照一定次序访问共享对象的过程，其中一个应用场景就是线程的休眠与唤醒。</p>
+<p>本次作业的线程休眠场景有两个，一个是贯穿三次作业的空队列休眠场景：当电梯对应的请求队列为空时，电梯线程应该休眠，等待新请求的加入；第二个则是面向第三次作业的线程结束休眠场景：由于第三次作业的线程结束不能仅依靠输入线程结束判断，所以电梯队列为空且输入线程结束后电梯线程依旧要休眠，等待拆分请求的到来&#x2F;线程结束信号的到来。</p>
+<p>而关于线程唤醒的策略，本次作业一开始采用的是“访问共享对象数据即唤醒”的原则，简单来说就是再所有加锁的地方都notifyAll。但是经过本地调试发现出现轮询，所以后面经过思考采用“需求分析法”进行设计。所谓的需求分析法就是分析线程休眠场景：例如上文分析请求队列为空时进行休眠，那就只在往请求队列中增加请求时才唤醒线程，具体实现实例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="comment">/*线程休眠场景*/</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (personQueue.isEmpty() &amp;&amp; !personQueue.isEnd()) &#123;</span><br><span class="line">    <span class="keyword">if</span> (direction != <span class="number">0</span>) &#123;</span><br><span class="line">        direction = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            personQueue.wait();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"><span class="comment">/*唤醒线程语句*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">addRequest</span><span class="params">(Request request)</span> &#123;</span><br><span class="line">    requests.add(request);</span><br><span class="line">    notifyAll();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="bug分析"><a href="#bug分析" class="headerlink" title="bug分析"></a>bug分析</h2><h3 id="自己程序bug"><a href="#自己程序bug" class="headerlink" title="自己程序bug"></a>自己程序bug</h3><p>本单元作业的bug主要有三个：集合的删除、输出线程安全、轮询。其中前两个bug出现在第一次作业，第三个bug出现在第二次作业。</p>
+<h4 id="集合的删除"><a href="#集合的删除" class="headerlink" title="集合的删除"></a>集合的删除</h4><p>这个bug来自于不规范的集合删除。利用for循环对ArrayList进行删除时，需要注意每次i–，具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; processQueue.size(); i++) &#123;</span><br><span class="line">    <span class="type">MyRequest</span> <span class="variable">request</span> <span class="operator">=</span> processQueue.get(i);</span><br><span class="line">    <span class="keyword">if</span> (request.getToBuilding() == building) &#123;</span><br><span class="line">        processQueue.remove(i);</span><br><span class="line">        i--;	<span class="comment">//这一句一定要加上</span></span><br><span class="line">        outQueue.add(request);</span><br><span class="line">        dealNextRequest(request);</span><br><span class="line">        personNum--;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="输出线程安全"><a href="#输出线程安全" class="headerlink" title="输出线程安全"></a>输出线程安全</h4><p>由于官方包的输出函数不保证线程安全，所以需要自己额外实现一个类保证输出线程的安全。具体如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OutputThread</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">println</span><span class="params">(String msg)</span> &#123;</span><br><span class="line">        TimableOutput.println(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该类实现了一个加锁的静态方法，保证输出操作的互斥，从而保证输出线程的安全。</p>
+<h4 id="轮询"><a href="#轮询" class="headerlink" title="轮询"></a>轮询</h4><p>由前文可知，本次作业的轮询主要来自于无意义的线程唤醒，相应的解决方案就是采用“需求分析法”分析唤醒。</p>
+<h3 id="互测bug"><a href="#互测bug" class="headerlink" title="互测bug"></a>互测bug</h3><p>互测主要采用自主debug过程中，hack到自己的数据hack别人的策略，总体hack成功率较低。</p>
+<h2 id="心得体会"><a href="#心得体会" class="headerlink" title="心得体会"></a>心得体会</h2><h3 id="层次化设计层面"><a href="#层次化设计层面" class="headerlink" title="层次化设计层面"></a>层次化设计层面</h3><p>本单元让我体会到层次化设计对于代码优美程度的重要作用。前文提到，对于横向电梯和纵向电梯这两个明显具有共性的电梯类别而言，共同继承于一个电梯父类明显是一个更为合理的设计选择，但是本次作业并没有这样做，导致电梯类成为一个巨类，不仅影响美观，还增加了debug的难度。</p>
+<h3 id="线程安全层面"><a href="#线程安全层面" class="headerlink" title="线程安全层面"></a>线程安全层面</h3><p>本次作业遇到的线程安全问题仅在输出线程安全中，而且是忘记实现的问题而非设计的问题，故本次作业的线程安全还是保证的比较好的。但是美中不足的是，本次作业的线程安全是在基本无脑套锁的前提下保证的，这必然影响了多线程并发的效率（虽然在本次作业中没有体现出来）。以后在保证线程安全的同时应该主动寻求和线程并发效率的协调，尽量做到安全而高效。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>总的来说电梯月是面向对象“更有料”的一个月，这不仅体现在多线程繁杂的前置知识中，也体现在多线程bug的不可复现性和轮询bug的隐蔽性中。当然这些也提示我，一方面要尽早掌握好前置知识（例如集合的增删、多种锁的实现等），从而能设计出更高效的代码；另一方面是多和同学交流（例如有关轮询的思考，本人就是和舍友xzh共同讨论出的，在此一并鸣谢）。总之，面向对象设计是一个思想＞实现、讨论＞单干的过程，希望能在后面的作业中多多注意。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/18/%E3%80%90BUAA-OO%E3%80%9101-Unit1-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%A7%A3%E6%9E%90/" rel="prev" title="【BUAA-OO】01 Unit1 表达式解析">
+      <i class="fa fa-chevron-left"></i> 【BUAA-OO】01 Unit1 表达式解析
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%B5%E6%A2%AF%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">电梯架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-number">1.1.</span> <span class="nav-text">第五次作业</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">整体架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">调度策略</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.1.2.</span> <span class="nav-text">调度器设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%8D%8F%E4%BD%9C%E5%85%B3%E7%B3%BB"><span class="nav-number">1.1.3.</span> <span class="nav-text">线程协作关系</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-number">1.2.</span> <span class="nav-text">第六次作业</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">整体架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-1"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84-1"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5-1"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">调度策略</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">调度器设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%8D%8F%E4%BD%9C%E5%85%B3%E7%B3%BB-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">线程协作关系</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%83%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-number">1.3.</span> <span class="nav-text">第七次作业</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">整体架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-2"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84-2"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5-2"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">调度策略</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1-2"><span class="nav-number">1.3.2.</span> <span class="nav-text">调度器设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%8D%8F%E4%BD%9C%E5%85%B3%E7%B3%BB-2"><span class="nav-number">1.3.3.</span> <span class="nav-text">线程协作关系</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E5%9D%97%E4%B8%8E%E9%94%81%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">同步块与锁的设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.1.</span> <span class="nav-text">锁的设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E4%BC%91%E7%9C%A0%E4%B8%8E%E5%94%A4%E9%86%92"><span class="nav-number">2.2.</span> <span class="nav-text">线程休眠与唤醒</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bug%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">bug分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%B7%B1%E7%A8%8B%E5%BA%8Fbug"><span class="nav-number">3.1.</span> <span class="nav-text">自己程序bug</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E7%9A%84%E5%88%A0%E9%99%A4"><span class="nav-number">3.1.1.</span> <span class="nav-text">集合的删除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8"><span class="nav-number">3.1.2.</span> <span class="nav-text">输出线程安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AE%E8%AF%A2"><span class="nav-number">3.1.3.</span> <span class="nav-text">轮询</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%92%E6%B5%8Bbug"><span class="nav-number">3.2.</span> <span class="nav-text">互测bug</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%83%E5%BE%97%E4%BD%93%E4%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">心得体会</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E5%8C%96%E8%AE%BE%E8%AE%A1%E5%B1%82%E9%9D%A2"><span class="nav-number">4.1.</span> <span class="nav-text">层次化设计层面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%B1%82%E9%9D%A2"><span class="nav-number">4.2.</span> <span class="nav-text">线程安全层面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">4.3.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hz Xie"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Hz Xie</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hz Xie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
