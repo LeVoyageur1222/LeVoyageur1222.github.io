@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本次作业需要完成一个社交图网络的框架并实现消息传递的功能，再通过相关查询功能实现，完成社交网络的构建。具体需要JML规格和相关图算法的知识。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【BUAA-OO】03 Unit3 社交图网络">
+<meta property="og:url" content="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9103-Unit3-%E7%A4%BE%E4%BA%A4%E5%9B%BE%E7%BD%91%E7%BB%9C/index.html">
+<meta property="og:site_name" content="LeVoyageur">
+<meta property="og:description" content="本次作业需要完成一个社交图网络的框架并实现消息传递的功能，再通过相关查询功能实现，完成社交网络的构建。具体需要JML规格和相关图算法的知识。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework9.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework10.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework11.png">
+<meta property="article:published_time" content="2022-07-18T03:50:00.000Z">
+<meta property="article:modified_time" content="2022-07-18T03:20:35.217Z">
+<meta property="article:author" content="Hz Xie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework9.png">
+
+<link rel="canonical" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9103-Unit3-%E7%A4%BE%E4%BA%A4%E5%9B%BE%E7%BD%91%E7%BB%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【BUAA-OO】03 Unit3 社交图网络 | LeVoyageur</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LeVoyageur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://levoyageur1222.github.io/2022/07/18/%E3%80%90BUAA-OO%E3%80%9103-Unit3-%E7%A4%BE%E4%BA%A4%E5%9B%BE%E7%BD%91%E7%BB%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Hz Xie">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LeVoyageur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【BUAA-OO】03 Unit3 社交图网络
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-18 11:50:00 / 修改时间：11:20:35" itemprop="dateCreated datePublished" datetime="2022-07-18T11:50:00+08:00">2022-07-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/BUAA-OO/" itemprop="url" rel="index"><span itemprop="name">BUAA-OO</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本次作业需要完成一个社交图网络的框架并实现消息传递的功能，再通过相关查询功能实现，完成社交网络的构建。具体需要JML规格和相关图算法的知识。</p>
+<span id="more"></span>
+
+<h2 id="社交图网络架构分析"><a href="#社交图网络架构分析" class="headerlink" title="社交图网络架构分析"></a>社交图网络架构分析</h2><h3 id="第九次作业"><a href="#第九次作业" class="headerlink" title="第九次作业"></a>第九次作业</h3><h4 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h4><p>本次作业需要完成一个社交图网络的初步框架。该社交图网络具有三个层次：Person-Group-Network。每个层次的设计需求如下：</p>
+<ol>
+<li>Person是组成社交图网络的基本原子，具有一定的属性，且可以通过“熟人”关系和别的Person进行连接；</li>
+<li>Group是一个群组，可以容纳多个Person，并对在Group中所有的Person进行某些属性上的统计。此处要注意的是，群组并不是“连通子块”，即群内的人并不一定相识（可以类比于现实当中的微信群，你也不是有微信群所有人好友的吧）；</li>
+<li>Network是完整的社交图网络，其中包含多个Group和多个Person，在社交网络中，可以对某个群组或个人的属性进行查询，也可以对人与人之间的连通情况进行查询。</li>
+</ol>
+<p>此外，每个层次都由官方包的接口提供了待实现的方法与相关的JML描述，我们要完成的任务就是理解整体架构并实现JML的描述。</p>
+<h4 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h4><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework9.png" alt="oo_homework9"></p>
+<h4 id="设计分析"><a href="#设计分析" class="headerlink" title="设计分析"></a>设计分析</h4><p>由于社交图网络的层次化结构，我们整体的设计用聚合关系构建：Person聚合为Group，Person聚合为Network，同时Group聚合为Network。由于具体方法都由JML规格给出，整体实现难度是比较低的，唯一要注意的是JML规格只给出设计要求，对于实现的性能是不做规定的，为此我们从两个方面提高性能：</p>
+<ol>
+<li>选择适当容器。在JML描述中不对集合的容器做出规定，但得益于规格中表示每个层次主体都包含一个独一无二的id，我们可以利用HashMap进行存储，从而达到O(1)级别的访问。</li>
+<li>连通算法。在Network层次中包含<code>isCircle</code>与<code>queryBlockSum</code>指令，前者要求传入两个Person，判断二者是否通过间接的熟人关系进行连通；后者则要求出Network中包含多少连通子块。对于该连通情况的查询，本次作业采取并查集算法，并将该算法内嵌到Network类中实现。具体实现见下文图算法部分。</li>
+</ol>
+<h3 id="第十次作业"><a href="#第十次作业" class="headerlink" title="第十次作业"></a>第十次作业</h3><h4 id="需求分析-1"><a href="#需求分析-1" class="headerlink" title="需求分析"></a>需求分析</h4><p>本次作业在上次作业的基础上增加了如下需求：</p>
+<ol>
+<li>实现Message接口，并在Person与Network层次扩展相关的存储容器和方法，从而进行消息的收发；</li>
+<li>官方测试指令扩展。尤其注意的是在上次作业已经实现的<code>queryGroupValueSum</code>在这次作业中要做出测试，故要注意实现的性能问题；</li>
+<li>新指令的扩展。尤其注意的是指令<code>queryLeastConnection</code>，本质上是对连通子块的最小生成树进行查询。</li>
+</ol>
+<h4 id="整体架构-1"><a href="#整体架构-1" class="headerlink" title="整体架构"></a>整体架构</h4><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework10.png" alt="oo_homework10"></p>
+<h4 id="迭代分析"><a href="#迭代分析" class="headerlink" title="迭代分析"></a>迭代分析</h4><p>对于三个需求增量，本次作业做出的处理如下</p>
+<ol>
+<li><p>对于新增的Message接口，我们严格依照JML描述实现即可；而对于Person与Network中存储消息的容器，由于在Person的具体功能中要求Message是有序的，故使用ArrayList进行存储，在Network中可以继续使用HashMap提高访问性能；而新增的传递消息的功能，我们也按照JML直接实现即可（因为实现上没有性能问题）。</p>
+</li>
+<li><p>由于官方测试指令的扩展，本次需要对一些指令的性能做出改进，改进的主要方式是缓存机制。例如指令<code>queryGroupValueSum</code>，可以通过在Group层次维护一个valueSum变量，在加人、删人和加关系三个操作时动态更新该变量即可；这样在每次访问该变量时可以做到O(1)的操作。</p>
+</li>
+<li><p>对于新增指令<code>queryLeastConnection</code>，采用朴素的贪心算法。为此在设计上做出如下调整：</p>
+<ul>
+<li>抽象出Relation类，对于人的关系进行存储，相当于连通子块的带权边；</li>
+<li>抽象出Block层次，存储连通子块的所有人和关系，并在类内查询最短路；</li>
+<li>抽象出BlockSum层次，是Network的另一种存储方式，对所有连通子块Block进行管理；</li>
+<li>将并查集算法UnionFind单独抽象为类，以便在不同地方使用。</li>
+</ul>
+<p>设计上做出调整后，算法的实现就只是细节问题了，具体见后面的图算法部分。</p>
+</li>
+</ol>
+<h3 id="第十一次作业"><a href="#第十一次作业" class="headerlink" title="第十一次作业"></a>第十一次作业</h3><h4 id="需求分析-2"><a href="#需求分析-2" class="headerlink" title="需求分析"></a>需求分析</h4><p>本次作业在上次作业的基础上增加了如下需求：</p>
+<ol>
+<li>扩展Message类，增加三个子类，以丰富消息的内涵；</li>
+<li>对于三个新增的消息类扩展功能；</li>
+<li>新增指令<code>sendIndirectMessage</code>，对于直接不可达的消息进行转发，并求出最短的转发路径。本质上是考察最短路算法。</li>
+</ol>
+<h4 id="整体架构-2"><a href="#整体架构-2" class="headerlink" title="整体架构"></a>整体架构</h4><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/oo_homework11.png" alt="oo_homework11"></p>
+<h4 id="迭代分析-1"><a href="#迭代分析-1" class="headerlink" title="迭代分析"></a>迭代分析</h4><p>对于三个需求增量，本次作业做出的处理如下</p>
+<ol>
+<li>对于新增的Message类，严格按照JML描述处理即可；</li>
+<li>对于新增的消息功能严格按照JML描述处理即可。当然要注意集合增删处理的细节，这里的问题会在测试部分做出描述；</li>
+<li>对于新增的最短路算法需求，本次做出的架构扩展如下：<ul>
+<li>新增ConfirmedNode类和Edge类，代表最短路算法中的已确认节点与边，其中Edge相对于Relation增加了支持链式前向星设计的改进，是Relation的另一种表示形式。二者都是是最短路算法的原子类；</li>
+<li>新增Dijkstra类，是求解最短路的迪杰斯特拉算法的算法类。</li>
+</ul>
+</li>
+</ol>
+<p>由于两次作业迭代形成的类已经有些繁多，再加上整体设计还算层次化，我在本次作业将相互关联的类都放在一个package中，从而形成更清楚的逻辑结构，具体设计如下：</p>
+<ol>
+<li>networkstruct：包含MyPerson、MyGroup、MyNetwork类。是社交图网络的具象结构。</li>
+<li>messages：包含MyMessage、MyEmojiMessage、MyNoticeMessage、MyRedEnvelopeMessage类。是社交网络中传递的消息。</li>
+<li>abstractstruct：包含Relation、Edge、Block、BlockSum类。表示出社交网络的基于连通块的抽象图结构。</li>
+<li>algorithm：包含ConfirmedNode、NodeComparator、UnionFind、Dijkstra类。是涉及的图算法类集合。</li>
+</ol>
+<p>具体的结构在UML类图的排布上也可见一斑。</p>
+<h2 id="性能分析与算法实现"><a href="#性能分析与算法实现" class="headerlink" title="性能分析与算法实现"></a>性能分析与算法实现</h2><h3 id="性能需求解析"><a href="#性能需求解析" class="headerlink" title="性能需求解析"></a>性能需求解析</h3><p>JML描述只对实现的结果做出规约，而不关心具体的性能与设计问题，所以在JML规格描述中会出现多层循环嵌套的结构。若不对这些描述的实现进行化简，容易造成性能较低的后果。在本单元作业中，性能优化可以分为两个方面进行。</p>
+<h4 id="基于缓存的性能"><a href="#基于缓存的性能" class="headerlink" title="基于缓存的性能"></a>基于缓存的性能</h4><p>以Group类中的<code>getValueSum</code>方法为例。其JML描述如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*@ ensures \result == (\sum int i; 0 &lt;= i &amp;&amp; i &lt; people.length; </span></span><br><span class="line"><span class="comment">@          (\sum int j; 0 &lt;= j &amp;&amp; j &lt; people.length &amp;&amp; </span></span><br><span class="line"><span class="comment">@           people[i].isLinked(people[j]); people[i].queryValue(people[j])));</span></span><br><span class="line"><span class="comment">@*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="comment">/*@ pure @*/</span> <span class="type">int</span> <span class="title function_">getValueSum</span><span class="params">()</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个指令单条时间复杂度就达到了O(n^2^)，若叠加n条指令，总复杂度可以达到O(n^3^)，这种复杂度是不可忍受的。为此，我们可以在Group类中维护valueSum属性，在每次增人、删人、增关系时动态更新这个变量，就可以做到查询时O(1)的复杂度。</p>
+<h4 id="基于图算法的性能"><a href="#基于图算法的性能" class="headerlink" title="基于图算法的性能"></a>基于图算法的性能</h4><p>社交网络本身是一个巨大的含有多个连通分支的图，所以在本单元的作业中也涉及了相关的图论问题，其高性能的实现需要依赖一定的图算法。具体的对应关系如下：</p>
+<ul>
+<li>连通性的查询——并查集算法</li>
+<li>最小生成树——Kruskal算法</li>
+<li>最短路径查询——Dijkstra算法</li>
+</ul>
+<p>其具体的实现见下面一个部分。由于不是算法课程，我仅对算法的思路做出理解性的阐述。</p>
+<h3 id="图算法"><a href="#图算法" class="headerlink" title="图算法"></a>图算法</h3><h4 id="按秩合并-并查集的连通查询"><a href="#按秩合并-并查集的连通查询" class="headerlink" title="按秩合并+并查集的连通查询"></a>按秩合并+并查集的连通查询</h4><p>并查集，在《啊哈！算法》一书中有个简短而精妙的描述“擒贼先擒王”。大致来说可以理解为：在增加两个点之间边&#x2F;关系的时候，若两个点先前没有连通，则确定一个“老大”节点，只要每次都确定了节点的序关系，就可以构建一个类似于黑社会的网络。而判断两个节点是否连通可以通过比较两个节点的“王”节点是否相同实现。</p>
+<p>当然，对于这样一个树形结构，影响性能的关键就是树的高度。为了尽量缩减树的高度，我们有两个优化点：按秩合并和路径压缩。</p>
+<p>所谓按秩合并，解决了这样一个问题：两个点之间谁做“老大”节点呢？很明显，为了减小树的高度，我们要使自己所在的树高度更高的节点作为老大。但是在实现过程中我们会发现高度这一变量难以维护，于是退而求其次，我们通过比较两棵树含有的节点数（重量&#x2F;秩）来作为判断标准，其原理是重量大的高度大概率更大。</p>
+<p>而路径压缩则发生在并查集的<code>find</code>函数中。大致来说，就是每次在寻找祖先的路径上，将路径上的所有点压缩，即修改路径上所有点的直接父亲为当前树的根节点。这样一来，这条路径上树的高度就变为了2，可以大大提高索引效率。</p>
+<h4 id="Kruskal算法求解最小生成树"><a href="#Kruskal算法求解最小生成树" class="headerlink" title="Kruskal算法求解最小生成树"></a>Kruskal算法求解最小生成树</h4><p>所谓Kruskal算法，就是按边排序的贪心算法：每次寻找权值最小的边，若这条边可以将两个本来不连通的点连接起来，则选定这条边，直到选中n-1（n为节点数）条边为止。而判断两个点是否连通，可以利用上一点中的并查集实现。（这也是我将并查集作为单独的类实现的原因之一——因为在多处使用到）。</p>
+<h4 id="链式前向星-Dijkstra的最短路查询"><a href="#链式前向星-Dijkstra的最短路查询" class="headerlink" title="链式前向星+Dijkstra的最短路查询"></a>链式前向星+Dijkstra的最短路查询</h4><p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44784918/article/details/107581655">Dijkstra求最短路(PriorityQueue)_得意霄尽欢的博客-CSDN博客</a></p>
+<p>所谓Dijkstra算法，本质也是贪心算法，它维护了两个节点集：确定最短路的节点集P和未确定最短路的节点集Q，其核心过程可以用递归表示为：</p>
+<ul>
+<li>在Q中寻找最短可达的节点q，加入集合P中；</li>
+<li>遍历q到Q中其他节点的边，看看是否可以更新还在Q中节点的最短距离。</li>
+</ul>
+<p>其中遍历边的操作可以进一步优化，用链式前向星存储具体的边的结构。所谓的链式前向星，就是一个存储一个起点对应多个边的邻接表。通过这个表访问边甚至可以达到比HashMap更高的效率。</p>
+<p>最短路算法的核心实现逻辑如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">queryShortestPath</span><span class="params">()</span> &#123;</span><br><span class="line">    distance.set(beginIndex, <span class="number">0</span>);</span><br><span class="line">    nodeQueue.add(<span class="keyword">new</span> <span class="title class_">ConfirmedNode</span>(beginIndex, <span class="number">0</span>));</span><br><span class="line">    <span class="keyword">while</span> (visited.get(endIndex) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="type">ConfirmedNode</span> <span class="variable">cfNode</span> <span class="operator">=</span> nodeQueue.poll();</span><br><span class="line">        <span class="type">int</span> <span class="variable">cfIndex</span> <span class="operator">=</span> cfNode.getIndex();</span><br><span class="line">        visited.set(cfIndex, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> heads.get(cfIndex); i != -<span class="number">1</span>; i = edges.get(i).getNextIndex()) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">toIndex</span> <span class="operator">=</span> edges.get(i).getToNode();</span><br><span class="line">            <span class="type">int</span> <span class="variable">value</span> <span class="operator">=</span> edges.get(i).getValue();</span><br><span class="line">            <span class="keyword">if</span> (visited.get(toIndex) == <span class="number">0</span> &amp;&amp;</span><br><span class="line">                distance.get(toIndex) &gt; distance.get(cfIndex) + value) &#123;</span><br><span class="line">                distance.set(toIndex, distance.get(cfIndex) + value);</span><br><span class="line">                nodeQueue.add(<span class="keyword">new</span> <span class="title class_">ConfirmedNode</span>(toIndex, distance.get(toIndex)));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> distance.get(endIndex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="基于规格的测试"><a href="#基于规格的测试" class="headerlink" title="基于规格的测试"></a>基于规格的测试</h2><h3 id="基于规格的全面测试"><a href="#基于规格的全面测试" class="headerlink" title="基于规格的全面测试"></a>基于规格的全面测试</h3><p>由于这次作业是基于JML描述进行开发的，而JML对各个输入限制都做了严格分类，我们要进行全面测试也可以基于规格进行数据的构造。由于本人并没有搭建自动评测机，只对评测数据的生成思路做出简单描述。</p>
+<p>首先是<strong>常规测试</strong>。在数据生成初期只生成<code>ap</code>、<code>ar</code>、<code>ag</code>、<code>atg</code>指令的生成，且尽量保证不抛出异常，从而构建一个比较大的且完整的社交图网络；之后保证图网络的不变，随机生成各种查询指令且尽量保证指令合法，从而对功能进行覆盖性的测试。</p>
+<p>其次是<strong>异常测试</strong>。对于各种异常即抛出顺序，JML规格都做出了严格规定。为此，我们只需要在常规测试下加大数据生成的随机性，既可以产生较为大量的异常数据。此外也可以通过压力测试加大异常概率。</p>
+<p>最后是<strong>基于规格细节和性能的测试</strong>。这两部分的数据在随机数据生成中不易产生，需要手动构造，具体看后面两点的介绍。</p>
+<h3 id="基于规格细节的测试"><a href="#基于规格细节的测试" class="headerlink" title="基于规格细节的测试"></a>基于规格细节的测试</h3><p>JML描述条分缕析地分类出各种输入行为下的输出情况，由于规格的需求，这种分类往往是细致甚至繁琐的，有些规格的细节没有被注意，容易造成实现的错误，对此可以构造基于规格细节的测试数据。</p>
+<p>例如在<code>addToGroup</code>方法的描述中有这样一条：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">@ also</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ requires (\exists int i; 0 &lt;= i &amp;&amp; i &lt; groups.length; groups[i].getId() == id2) &amp;&amp;</span></span><br><span class="line"><span class="comment">@           (\exists int i; 0 &lt;= i &amp;&amp; i &lt; people.length; people[i].getId() == id1) &amp;&amp;</span></span><br><span class="line"><span class="comment">@            getGroup(id2).hasPerson(getPerson(id1)) == false &amp;&amp; </span></span><br><span class="line"><span class="comment">@             getGroup(id2).people.length &gt;= 1111;</span></span><br><span class="line"><span class="comment">@ assignable \nothing;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>规格要求在组内人数≥1111时不能向组内增加人数。为此可以构造数据：向组内添加1110个人，添加第1111个人时选择之前添加过的id，若不抛出异常则实现正确。</p>
+<h3 id="基于性能的测试"><a href="#基于性能的测试" class="headerlink" title="基于性能的测试"></a>基于性能的测试</h3><p>在上文中我们提到过，JML只对最终结果做出契约，而对设计的过程不做过多规定，所以其描述总是“简朴”的——从另一方面来说，是不保证性能的。例如上文出现的在Group类中的<code>getValueSum</code>方法，其描述中采用的是两层for循环，自身的复杂度达到了O(n^2^)，再叠加n条这样的指令，最终复杂度可以达到O(n^3^)，时间开销是恐怖的。为此我们可以构造数据（总2000条指令）：创建666个人并添加进组，之后查询组内<code>valueSum</code>666次，可以达到最大的时间复杂度，从而进行卡性能的测试。</p>
+<p>与此类似的可以卡性能的指令还有<code>queryBlockSum</code>，具体构造不再赘述。（总的来说，单条指令的复杂度达到O(n^2^)的都可以进行尝试）。</p>
+<h3 id="基于语言特性的测试"><a href="#基于语言特性的测试" class="headerlink" title="基于语言特性的测试"></a>基于语言特性的测试</h3><p>在第十次作业的过程中，我的程序在高工大佬的测试下出现了一个bug，这个bug之神奇，以致于官方包都没有考虑周全。（所以本人也不幸hack到了官方包，导致一刀七事件的发生，在此向被hack的同学做出诚挚的道歉）</p>
+<p>简单来说，这个bug触碰到了一个Java ArrayList中<code>remove</code>方法的底层逻辑。一言以蔽之，<code>remove</code>方法的逻辑如下所述：</p>
+<blockquote>
+<p>remove()方法删除的元素为：按照列表索引值从小到大遍历，<strong>equals方法</strong>判断相等的<strong>第一个</strong>元素。而所谓的equals方法判断相等，在不重写equals方法的前提下，为<strong>内存位置相同的同一元素</strong>；而在重写equals方法后，<strong>一定要注意判断相等的逻辑</strong>，避免误删情况的发生。</p>
+</blockquote>
+<p>由于这样的特性，我们可以构造如下数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ap 1 A 12</span><br><span class="line">ap 2 B 13</span><br><span class="line">ar 1 2 3</span><br><span class="line">anm 3 mindYourNoticeRemove 0 1 2</span><br><span class="line">sm 3</span><br><span class="line">am 3 12 0 1 2</span><br><span class="line">sm 3</span><br><span class="line">cn 2</span><br><span class="line">qrm 2</span><br></pre></td></tr></table></figure>
+
+<p>在这组数据中，我们首先向一个人发送id为3的notice消息，由于此时社交网络中已经不包含id为3的消息，所以可以再加入一个id为3的普通消息并发送。此时这个人获取了两个id为3的消息，且普通消息被插入消息列表头部。之后调用cn（clear notice）指令。对于如下实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ArrayList&lt;Message&gt; delMessages = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (Message message : getPerson(personId).getMessages()) &#123;</span><br><span class="line">    <span class="keyword">if</span> (message <span class="keyword">instanceof</span> NoticeMessage) &#123;</span><br><span class="line">        delMessages.add(message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">MyPerson</span> <span class="variable">person</span> <span class="operator">=</span> (MyPerson) getPerson(personId);</span><br><span class="line"><span class="keyword">for</span> (Message message : delMessages) &#123;</span><br><span class="line">    person.delMessage(message);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中delMessage方法调用的正是<code>remove</code>方法，由于传入的是message元素，而不是具体索引位置，所以判断删除调用了<code>equals</code>方法，不巧的是，我们的<code>equals</code>方法判断的正是id，所以导致删除的是第一个出现的普通消息，而非应该删除的notice消息。</p>
+<p>当然，在修改官方程序后，这样的数据直接被认定为非法了。但是其体现的内核——实现过程中要时刻注意Java语言的特性，是令我受益匪浅的。</p>
+<h2 id="社交图网络的扩展"><a href="#社交图网络的扩展" class="headerlink" title="社交图网络的扩展"></a>社交图网络的扩展</h2><h3 id="题目要求"><a href="#题目要求" class="headerlink" title="题目要求"></a>题目要求</h3><p>假设出现了几种不同的Person</p>
+<ul>
+<li><p>Advertiser：持续向外发送产品广告</p>
+</li>
+<li><p>Producer：产品生产商，通过Advertiser来销售产品</p>
+</li>
+<li><p>Customer：消费者，会关注广告并选择和自己偏好匹配的产品来购买</p>
+<blockquote>
+<p>所谓购买，就是直接通过Advertiser给相应Producer发一个购买消息</p>
+</blockquote>
+</li>
+<li><p>Person：吃瓜群众，不发广告，不买东西，不卖东西</p>
+</li>
+</ul>
+<p>扩展Network，使之可以支持市场营销，并能查询某种商品的销售额和销售路径等。</p>
+<h3 id="初步设计"><a href="#初步设计" class="headerlink" title="初步设计"></a>初步设计</h3><p>思考社交网络中产品产生的逻辑：人们首先有一个需求，商家根据这个需求生产产品，再由经销商进行推销。推销到消费者后，消费者根据生产的具体商品的信息判断是否买该商品：若买商品，则发送购买消息给经销商；否则直接删除推销消息。</p>
+<p>为此，我们需要三个方面的扩展：</p>
+<h4 id="产品扩展"><a href="#产品扩展" class="headerlink" title="产品扩展"></a>产品扩展</h4><p>产品是扩展为市场营销的新主体，需要单独设计一个接口Product。在设计具体的接口属性时，我们需要思考所谓的“消费者需求”这个逻辑。为什么消费者会有购物需求？一方面，这个产品的种类恰巧是ta需要的种类，另一方面，这个产品的价格不超出消费者预算。所以我们为此要额外扩展一个类。具体设计如下。</p>
+<ul>
+<li><code>Type</code>枚举类：表示商品的类别，是匹配商品是不是消费者偏好的抽象类型。（具体的字段可以如食物、饮品等）。</li>
+<li><code>Product</code>接口：表示具体的产品。具有属性<code>id</code>，指代具体的产品；<code>type</code>，指代产品的种类；<code>price</code>，指代产品的价格。</li>
+</ul>
+<h4 id="消息扩展"><a href="#消息扩展" class="headerlink" title="消息扩展"></a>消息扩展</h4><p>要进行营销应该设计两类消息：推销消息与购买消息，两个消息都可以通过继承Message接口实现。具体设计如下。</p>
+<ul>
+<li><code>AdvertisementMessage</code>：推销消息。包含<code>ProducerId</code>，<code>AdvertiserId</code>和<code>Product</code>，指代生产者、经销商和具体商品（的信息）。</li>
+<li><code>PurchaseMessage</code>：购买消息。包含<code>CostomerId</code>，<code>AdvertiserId</code>，<code>Product</code>和<code>Number</code>，指代生产者、经销商和具体商品（的信息）和购买数量。</li>
+</ul>
+<h4 id="人的扩展"><a href="#人的扩展" class="headerlink" title="人的扩展"></a>人的扩展</h4><p>涉及的三类人可以通过继承Person接口实现。具体设计如下。</p>
+<ul>
+<li><code>Advertiser</code>：经销商。需要存储联系的<code>producers[]</code>与<code>costomers[]</code>，并负责收发推销消息与购买消息；</li>
+<li><code>Producer</code>：产品商。需要存储自己生产的<code>products[]</code>和对应产量<code>outputs[]</code>，从而提供产品。</li>
+<li><code>Costomer</code>：消费者。需要存储自己的需求<code>types[]</code>和需求量<code>demands[]</code>，已经拥有的产品<code>products[]</code>和持有量<code>holds[]</code>，从而对推销消息做出响应，并支持销售量的查询。</li>
+</ul>
+<h3 id="JML规格"><a href="#JML规格" class="headerlink" title="JML规格"></a>JML规格</h3><p>这里仅对消费者和查询产品销量的相关操作做出设计。</p>
+<ul>
+<li><p>判断消费者是否有需求</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ assignable \nothing;</span></span><br><span class="line"><span class="comment">@ ensures \result == ((\exists int i; 0 &lt;= i &amp;&amp; i &lt;= types.length; </span></span><br><span class="line"><span class="comment">@ 					 adMessage.getProduct.getType.equals(types[i])) &amp;&amp; </span></span><br><span class="line"><span class="comment">@ 					 (adMessage.getProduct.getPrice * </span></span><br><span class="line"><span class="comment">@					 getDemand(adMessage.getProduct.getType) &lt; money));</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">hasDemand</span><span class="params">(AdvertisementMessage adMessage)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>判断消费者某件商品购买量</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ requires containsProduct(product);</span></span><br><span class="line"><span class="comment">@ assignable \nothing;</span></span><br><span class="line"><span class="comment">@ ensures \result == ((\exists int i; 0 &lt;= i &amp;&amp; i &lt;= products.length; </span></span><br><span class="line"><span class="comment">@ 					 product == products[i]) holds[i]);</span></span><br><span class="line"><span class="comment">@ also</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ requires !containsProduct(product);</span></span><br><span class="line"><span class="comment">@ assignable \nothing;</span></span><br><span class="line"><span class="comment">@ ensures \result == 0;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">queryAmount</span><span class="params">(Product product)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>判断消费者是否含有某消息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ assignable \nothing;</span></span><br><span class="line"><span class="comment">@ ensures \result == (\exists int i; 0 &lt;= i &amp;&amp; i &lt;= messages.length; </span></span><br><span class="line"><span class="comment">@ 					 messages[i].getMessageId == messageId);</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">containsMessage</span><span class="params">(<span class="type">int</span> messageId)</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>Costomer</code>处理广告消息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ requires containsMessage(adMessage.getId) &amp;&amp; hasDemand(adMessage);</span></span><br><span class="line"><span class="comment">@ assignable messages[], money;</span></span><br><span class="line"><span class="comment">@ ensures messages.length == (\old(messages.length) - 1);</span></span><br><span class="line"><span class="comment">@ ensures (\forall int i; 0 &lt;= i &amp;&amp; i &lt; \old(messages.length); </span></span><br><span class="line"><span class="comment">@		  (\exists int j; 0 &lt;= j &amp;&amp; j &lt; messages.length; 		</span></span><br><span class="line"><span class="comment">@		  messages[j].equals(\old(messages[i]))));</span></span><br><span class="line"><span class="comment">@ ensures (\forall int i; 0 &lt;= i &amp;&amp; i &lt; messages.length; </span></span><br><span class="line"><span class="comment">@		  !messages[i].equals(adMessage));</span></span><br><span class="line"><span class="comment">@ ensures money == (\old(money) - adMessage.getProduct.getPrice * </span></span><br><span class="line"><span class="comment">@					getDemand(adMessage.getProduct.getType));</span></span><br><span class="line"><span class="comment">@ also</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ requires containsMessage(adMessage.getId) &amp;&amp; !hasDemand(adMessage);</span></span><br><span class="line"><span class="comment">@ assignable messages[];</span></span><br><span class="line"><span class="comment">@ ensures messages.length == (\old(messages.length) - 1);</span></span><br><span class="line"><span class="comment">@ ensures (\forall int i; 0 &lt;= i &amp;&amp; i &lt; \old(messages.length); </span></span><br><span class="line"><span class="comment">@		  (\exists int j; 0 &lt;= j &amp;&amp; j &lt; messages.length; 		</span></span><br><span class="line"><span class="comment">@		  messages[j].equals(\old(messages[i]))));</span></span><br><span class="line"><span class="comment">@ ensures (\forall int i; 0 &lt;= i &amp;&amp; i &lt; messages.length; </span></span><br><span class="line"><span class="comment">@		  !messages[i].equals(adMessage));</span></span><br><span class="line"><span class="comment">@ also</span></span><br><span class="line"><span class="comment">@ public exceptional_behavior</span></span><br><span class="line"><span class="comment">@ requires !containsMessage(adMessage.getId);</span></span><br><span class="line"><span class="comment">@ signals (MessageNotFoundException e) !containsMessage(adMessage.getId);</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">dealAdvertisement</span><span class="params">(AdvertisementMessage adMessage)</span> <span class="keyword">throws</span> MessageNotFoundException;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>求商品销量</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">@ public normal_behavior</span></span><br><span class="line"><span class="comment">@ requires existProduct(product);</span></span><br><span class="line"><span class="comment">@ ensures \result == (product.getPrice * (\sum int i; 0 &lt;= i &amp;&amp; i &lt;= people.length; </span></span><br><span class="line"><span class="comment">@ 					 isCostomer(people[i]) ? people[i].queryAmount(product) : 0))</span></span><br><span class="line"><span class="comment">@ also</span></span><br><span class="line"><span class="comment">@ public exceptional_behavior</span></span><br><span class="line"><span class="comment">@ requires !existProduct(product);</span></span><br><span class="line"><span class="comment">@ signals (ProductNotFoundException e) !existProduct(product);</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">querySales</span><span class="params">(Product product)</span> <span class="keyword">throws</span> ProductNotFoundException;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="本单元学习体会"><a href="#本单元学习体会" class="headerlink" title="本单元学习体会"></a>本单元学习体会</h2><h3 id="契约式编程"><a href="#契约式编程" class="headerlink" title="契约式编程"></a>契约式编程</h3><p>本单元接触学习的JML规格描述语言，其本质上是契约式编程的一个表现。而所谓的契约式编程，又是建立在防御式编程背景之下的，所以先对防御式编程做出定义。</p>
+<p>所谓的<strong>防御式编程</strong>，其本质思想是“人类都是不安全、不值得信任的，所有的人，都会犯错误，而你写的代码，应该考虑到所有可能发生的错误，让你的程序不会因为他人的错误而发生错误”，一言以概之，就是你要对设计过程的细节<strong>“大包大揽”</strong>。而如何保证这种实现的错误能够提醒他人呢？在C++中提供了<strong>断言</strong>机制，在Java中提供了<strong>捕获与抛出异常</strong>机制，均可以实现对各种情况错误的提醒。</p>
+<p>而<strong>契约式编程</strong>则更简单：由需求者提供程序实现的契约，再由实现者依照契约完成。这样程序员就不用哭天抢地地思考各个实现的细节——相反，契约之外的错误，都是架构师设计不完善导致的，与我无关(●’◡’●)。而要完整地进行规约，一般可以将契约分为<strong>前置条件-后置条件-不变式条件</strong>三个，不得不说这对规格设计者是一个不小的挑战。而且在我看来，设计规格和实现规格相比，设计规格说不定更加暗含了面向对象的设计思想（也许这就是让我们在博客中涉及规格的初衷？）。</p>
+<h3 id="设计模式原则初探"><a href="#设计模式原则初探" class="headerlink" title="设计模式原则初探"></a>设计模式原则初探</h3><p>在本单元的作业过程中，我还尝试将设计模式的具体原则融入到设计中。具体体现如下：</p>
+<h4 id="开闭原则"><a href="#开闭原则" class="headerlink" title="开闭原则"></a>开闭原则</h4><p>开闭原则的描述如下：</p>
+<p><em><strong>Software entities should be open for extension，but closed for modification.</strong></em></p>
+<p>也就是说软件的迭代设计，应该保证对扩展开放，对修改关闭。具体到本次作业中，在第十一次作业时我新增了Edge类，其表示的其实也是社交网络的边而已，只不过为了链式前向星的设计增加了一些设计需求。对此，我没有在原有的Relation类中进行修改，而是直接扩展一个单独的类，其目的就是为了保证扩展不会对原有功能造成影响，应该体现了开闭原则的要求。</p>
+<h4 id="单一职责原则"><a href="#单一职责原则" class="headerlink" title="单一职责原则"></a>单一职责原则</h4><p>单一职责原则的描述如下：</p>
+<p><em><strong>There should never be more than one reason for a class to change.</strong></em></p>
+<p>也就是说在类的设计中，需要发现不同职责并将其分离，从而封装到不同的类或模块中。具体到本次作业，我在第九次到第十次作业的迭代开发过程中，将原本在MyNetwork类中实现的并查集算法单独封装成了一个UnionFind类，这就是细化每个类职责的过程。</p>
+<p>此外，在总结课上，对于父子类之间JML前置条件、后置条件等的设计需求，也让我深入体会了第三个设计原则。</p>
+<h4 id="里氏替换原则"><a href="#里氏替换原则" class="headerlink" title="里氏替换原则"></a>里氏替换原则</h4><p>里氏替换原则的描述如下：</p>
+<p><em><strong>Inheritance should ensure that any property proved about super-type objects also holds for sub-type objects</strong></em></p>
+<p>这个原则初看有些难以理解，但是其本质就是<em>子类<strong>可以扩展</strong>父类的功能，但<strong>不能改变</strong>父类原有的功能</em>。具体到前置条件和后置条件的设计上，父子类应该满足如下关系：</p>
+<ul>
+<li>当子类的方法重载父类的方法时，方法的前置条件（即方法的输入参数）要比父类的方法更宽松</li>
+<li>当子类的方法实现父类的方法时（重写&#x2F;重载或实现抽象方法），方法的后置条件（即方法的的输出&#x2F;返回值）要比父类的方法更严格或相等</li>
+</ul>
+<p>当然，设计模式的原则远不止这三条，其每一条的内涵也远不止上文所提及的如此肤浅。希望我能够在未来软件设计的征程中逐步体会，不断深入学习。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>本单元的作业要特别鸣谢两个人。一个是我的室友xzh，每次作业的整体作业架构都是在我们的讨论下形成的，也正因如此，我们具体实现后进行“形式化验证”（也就是肉眼对照代码逻辑），才使得整体实现的bug大大减少；此外还要感谢高工大佬jbt，是他提供的自动评测机测出了我每次作业初版代码的bug。总之，这单元给我的体会就是友好，也希望下一单元的作业能够同样友善，从而完美收官OO课程。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/18/%E3%80%90BUAA-OO%E3%80%9102-Unit2-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%94%B5%E6%A2%AF/" rel="prev" title="【BUAA-OO】02 Unit2 多线程电梯">
+      <i class="fa fa-chevron-left"></i> 【BUAA-OO】02 Unit2 多线程电梯
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BE%E4%BA%A4%E5%9B%BE%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">社交图网络架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B9%9D%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-number">1.1.</span> <span class="nav-text">第九次作业</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">1.1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90"><span class="nav-number">1.1.3.</span> <span class="nav-text">设计分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%8D%81%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-number">1.2.</span> <span class="nav-text">第十次作业</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%88%86%E6%9E%90"><span class="nav-number">1.2.3.</span> <span class="nav-text">迭代分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%8D%81%E4%B8%80%E6%AC%A1%E4%BD%9C%E4%B8%9A"><span class="nav-number">1.3.</span> <span class="nav-text">第十一次作业</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84-2"><span class="nav-number">1.3.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%88%86%E6%9E%90-1"><span class="nav-number">1.3.3.</span> <span class="nav-text">迭代分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E4%B8%8E%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">性能分析与算法实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E9%9C%80%E6%B1%82%E8%A7%A3%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">性能需求解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%BC%93%E5%AD%98%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">2.1.1.</span> <span class="nav-text">基于缓存的性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%AE%97%E6%B3%95%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">2.1.2.</span> <span class="nav-text">基于图算法的性能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">图算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%89%E7%A7%A9%E5%90%88%E5%B9%B6-%E5%B9%B6%E6%9F%A5%E9%9B%86%E7%9A%84%E8%BF%9E%E9%80%9A%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.2.1.</span> <span class="nav-text">按秩合并+并查集的连通查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Kruskal%E7%AE%97%E6%B3%95%E6%B1%82%E8%A7%A3%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91"><span class="nav-number">2.2.2.</span> <span class="nav-text">Kruskal算法求解最小生成树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%93%BE%E5%BC%8F%E5%89%8D%E5%90%91%E6%98%9F-Dijkstra%E7%9A%84%E6%9C%80%E7%9F%AD%E8%B7%AF%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.2.3.</span> <span class="nav-text">链式前向星+Dijkstra的最短路查询</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%A7%84%E6%A0%BC%E7%9A%84%E6%B5%8B%E8%AF%95"><span class="nav-number">3.</span> <span class="nav-text">基于规格的测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%A7%84%E6%A0%BC%E7%9A%84%E5%85%A8%E9%9D%A2%E6%B5%8B%E8%AF%95"><span class="nav-number">3.1.</span> <span class="nav-text">基于规格的全面测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%A7%84%E6%A0%BC%E7%BB%86%E8%8A%82%E7%9A%84%E6%B5%8B%E8%AF%95"><span class="nav-number">3.2.</span> <span class="nav-text">基于规格细节的测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%80%A7%E8%83%BD%E7%9A%84%E6%B5%8B%E8%AF%95"><span class="nav-number">3.3.</span> <span class="nav-text">基于性能的测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%AF%AD%E8%A8%80%E7%89%B9%E6%80%A7%E7%9A%84%E6%B5%8B%E8%AF%95"><span class="nav-number">3.4.</span> <span class="nav-text">基于语言特性的测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BE%E4%BA%A4%E5%9B%BE%E7%BD%91%E7%BB%9C%E7%9A%84%E6%89%A9%E5%B1%95"><span class="nav-number">4.</span> <span class="nav-text">社交图网络的扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%E8%A6%81%E6%B1%82"><span class="nav-number">4.1.</span> <span class="nav-text">题目要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E6%AD%A5%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.2.</span> <span class="nav-text">初步设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%A7%E5%93%81%E6%89%A9%E5%B1%95"><span class="nav-number">4.2.1.</span> <span class="nav-text">产品扩展</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E6%89%A9%E5%B1%95"><span class="nav-number">4.2.2.</span> <span class="nav-text">消息扩展</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%BA%E7%9A%84%E6%89%A9%E5%B1%95"><span class="nav-number">4.2.3.</span> <span class="nav-text">人的扩展</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JML%E8%A7%84%E6%A0%BC"><span class="nav-number">4.3.</span> <span class="nav-text">JML规格</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%8D%95%E5%85%83%E5%AD%A6%E4%B9%A0%E4%BD%93%E4%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">本单元学习体会</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%91%E7%BA%A6%E5%BC%8F%E7%BC%96%E7%A8%8B"><span class="nav-number">5.1.</span> <span class="nav-text">契约式编程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8E%9F%E5%88%99%E5%88%9D%E6%8E%A2"><span class="nav-number">5.2.</span> <span class="nav-text">设计模式原则初探</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99"><span class="nav-number">5.2.1.</span> <span class="nav-text">开闭原则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%95%E4%B8%80%E8%81%8C%E8%B4%A3%E5%8E%9F%E5%88%99"><span class="nav-number">5.2.2.</span> <span class="nav-text">单一职责原则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8C%E6%B0%8F%E6%9B%BF%E6%8D%A2%E5%8E%9F%E5%88%99"><span class="nav-number">5.2.3.</span> <span class="nav-text">里氏替换原则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">5.3.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hz Xie"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Hz Xie</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hz Xie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
