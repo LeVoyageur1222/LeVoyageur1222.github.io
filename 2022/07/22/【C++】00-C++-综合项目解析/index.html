@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本项目整体利用C++面向对象的思想实现操作系统部分功能的模拟，本篇串写主要采用了项目中作业调度和内存管理部分的源码进行分析，将从项目结构、面向对象思想、C++关键语法和设计模式四个方面进行分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【C++】00 C++ 综合项目解析">
+<meta property="og:url" content="https://levoyageur1222.github.io/2022/07/22/%E3%80%90C++%E3%80%9100-C++-%E7%BB%BC%E5%90%88%E9%A1%B9%E7%9B%AE%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="LeVoyageur">
+<meta property="og:description" content="本项目整体利用C++面向对象的思想实现操作系统部分功能的模拟，本篇串写主要采用了项目中作业调度和内存管理部分的源码进行分析，将从项目结构、面向对象思想、C++关键语法和设计模式四个方面进行分析。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img01_%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img02_%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img03_%E5%B0%81%E8%A3%85.png">
+<meta property="article:published_time" content="2022-07-22T08:30:00.000Z">
+<meta property="article:modified_time" content="2022-07-22T08:33:04.206Z">
+<meta property="article:author" content="Hz Xie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img01_%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6.png">
+
+<link rel="canonical" href="https://levoyageur1222.github.io/2022/07/22/%E3%80%90C++%E3%80%9100-C++-%E7%BB%BC%E5%90%88%E9%A1%B9%E7%9B%AE%E8%A7%A3%E6%9E%90/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【C++】00 C++ 综合项目解析 | LeVoyageur</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LeVoyageur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://levoyageur1222.github.io/2022/07/22/%E3%80%90C++%E3%80%9100-C++-%E7%BB%BC%E5%90%88%E9%A1%B9%E7%9B%AE%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Hz Xie">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LeVoyageur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【C++】00 C++ 综合项目解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-07-22 16:30:00 / 修改时间：16:33:04" itemprop="dateCreated datePublished" datetime="2022-07-22T16:30:00+08:00">2022-07-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本项目整体利用C++面向对象的思想实现操作系统部分功能的模拟，本篇串写主要采用了项目中作业调度和内存管理部分的源码进行分析，将从项目结构、面向对象思想、C++关键语法和设计模式四个方面进行分析。</p>
+<span id="more"></span>
+
+<h2 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h2><p>项目整体利用C++面向对象的思想实现操作系统部分功能的模拟，本篇串写主要采用了项目中作业调度和内存管理部分的源码进行分析，将从项目结构、面向对象思想、C++关键语法和设计模式四个方面进行分析。</p>
+<h3 id="作业调度"><a href="#作业调度" class="headerlink" title="作业调度"></a>作业调度</h3><h4 id="项目需求分析"><a href="#项目需求分析" class="headerlink" title="项目需求分析"></a>项目需求分析</h4><p>本项目需要模拟不同进程调度算法并比较优劣，项目整体采取“作业抽象结构-调度算法-调度类”的逻辑顺序实现。具体来说，项目首先需要建立进程的基本模型，以供调度算法进行调度；其次，要实现不同的调度算法，其实就是实现不同的作业优先级比较器；最后要实现作业调度类，以实现对作业调度过程的模拟与结果的比较。此外，项目在单道程序调度的基础上实现了多道程序调度，在考虑作业所需的资源后对调度过程进行了更加贴近实际的模拟。作业调度的类图如下。</p>
+<h4 id="UML类图"><a href="#UML类图" class="headerlink" title="UML类图"></a>UML类图</h4><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img01_%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6.png" alt="c++_00_img01_作业调度"></p>
+<h4 id="核心类分析"><a href="#核心类分析" class="headerlink" title="核心类分析"></a>核心类分析</h4><ol>
+<li>作业抽象结构<ul>
+<li><code>PCB</code>：进程控制块，包含进程的id、状态和优先级信息，同时包含指向作业控制块的指针；</li>
+<li><code>JCB</code>：作业控制块，包含作业标识、作业调度相关时间、作业调度资源等信息；</li>
+</ul>
+</li>
+<li>作业调度算法<ul>
+<li><code>SchedulingAlgorithm</code>：作业调度算法的统一父类，关联了<code>JCB</code>类进行具体调度优先级的判断，包含初始化和作业调度两个抽象方法；</li>
+<li><code>*SchedulingAlgorithm</code>：<code>SchedulingAlgorithm</code>的具体子类（例如<code>FCFSSchedulingAlgorithm</code>），在子类中包含一个内部类<code>PriorityCmp</code>用于确定调度作业的优先级；<ul>
+<li><code>PriorityCmp</code>：确定调度作业优先级的内部类，其中包含<code>operator</code>方法返回优先级比较结果；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>作业调度类<ul>
+<li><code>JobScheduling</code>：作业调度的具体类，类中包含三个队列分别存储提交-运行-完成三类作业，通过实现一个内部类进行按提交顺序的排列，并通过关联一个具体算法类实现提交作业的按优先级调度过程；<ul>
+<li><code>PriorityCmpForMock</code>：内部类，确定作业提交的优先级（按照作业提交时间排序）；</li>
+</ul>
+</li>
+<li><code>SimpleBatchProcessingSystemJobScheduling</code>：单道程序调度类，是<code>JobScheduling</code>的子类，通过实现子类函数<code>start</code>进行作业调度的模拟；</li>
+<li><code>MultiprogrammedBatchProcessingSystemJobScheduling</code>：多道程序调度类，同样是<code>JobScheduling</code>的子类，通过实现子类函数<code>start</code>进行作业调度的模拟，此外，通过实现两个内部类进行进程提交时间的比较和进程调度优先级的比较，从而模拟多道程序调度作业的情况；<ul>
+<li><code>PriorityCmpForPCB</code>：进行进程优先级的比较，从而将作业从<code>back_queue_</code>等待队列中取出，按优先级调入<code>psa_ready_queue_</code>调度队列中；</li>
+<li><code>PriorityCmpForBack</code>：进行进程提交时间的比较，从而将作业加入<code>back_queue_</code>队列中。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><h4 id="项目需求分析-1"><a href="#项目需求分析-1" class="headerlink" title="项目需求分析"></a>项目需求分析</h4><p>本项目需要实现请求页式内存管理的基本模型，项目整体采用“内存空间抽象-页置换算法-请求页实现类”的逻辑顺序实现。具体来说，项目首先建立物理页和用户内存空间的抽象模型；之后，项目建立了具体的页置换算法类，从而实现请求页中物理页满时的置换；最后，项目实现了请求页（页面置换）实现类，从而模拟请求调页和页面置换的过程。内存管理的类图如下。</p>
+<h4 id="UML类图-1"><a href="#UML类图-1" class="headerlink" title="UML类图"></a>UML类图</h4><p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img02_%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.png" alt="c++_00_img02_内存管理"></p>
+<h4 id="核心类分析-1"><a href="#核心类分析-1" class="headerlink" title="核心类分析"></a>核心类分析</h4><ol>
+<li>内存空间抽象<ul>
+<li><code>Page</code>：物理页的抽象结构，包含页框号和页面使用相关信息；</li>
+<li><code>UserMemorySpace</code>：用户内存空间的抽象，包含用户空间与内存空间大小和物理页队列等信息；同时提供<code>getter</code>方法可以对用户内存空间的相关信息进行查询；<ul>
+<li><code>PageInfo</code>：<code>UserMemorySpace</code>的内部类，用于记录页面使用情况；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>页置换算法<ul>
+<li><code>PageReplacementAlgorithm</code>：页面置换算法的统一父类，关联了<code>UserMemorySpace</code>类对内存空间进行模拟操作与调页，包含待子类实现的三个抽象方法；</li>
+<li><code>*PageReplacementAlgorithm</code>：<code>PageReplacementAlgorithm</code>的具体子类，实现父类方法，同时通过实现内部类的方式判断请求页面的优先级关系；<ul>
+<li><code>PriorityCmp</code>：<code>*PageReplacementAlgorithm</code>的内部类，是一个请求页面优先级的比较器；</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>请求页实现类<ul>
+<li><code>PageReplacement</code>：对页面置换逻辑的封装，主要用于聚合<code>PageReplacementAlgorithm</code>类和<code>UserMemorySpace</code>类，并设置相应的物理用户内存空间的大小；</li>
+<li><code>PageReplacementWrapper</code>：对<code>PageReplacement</code>的进一步封装，指引用户交互使用项目。</li>
+</ul>
+</li>
+</ol>
+<h2 id="面向对象特征分析"><a href="#面向对象特征分析" class="headerlink" title="面向对象特征分析"></a>面向对象特征分析</h2><h3 id="封装性"><a href="#封装性" class="headerlink" title="封装性"></a>封装性</h3><h4 id="逻辑性封装"><a href="#逻辑性封装" class="headerlink" title="逻辑性封装"></a>逻辑性封装</h4><p>所谓的逻辑性封装，就是将代码中合乎逻辑整体性的部分进行组合，本项目中可以体现为如下几点。</p>
+<ol>
+<li><p>封装，从<code>struct</code>开始</p>
+<p>对于一些简单数据属性的组合，本项目采用<code>struct</code>进行封装，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">JCB</span></span><br><span class="line">&#123;</span><br><span class="line">	std::string job_name;</span><br><span class="line">	TimeSlice submit_time;</span><br><span class="line">	TimeSlice required_running_time;</span><br><span class="line">	TimeSlice start_time = <span class="number">-1</span>;</span><br><span class="line">	TimeSlice finish_time = <span class="number">0</span>;</span><br><span class="line">	TimeSlice already_run_time = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	Resource required_resource;</span><br><span class="line">	JobStatus job_status;</span><br><span class="line">	PCBptr pcb = <span class="keyword">new</span> <span class="built_in">PCB</span>(<span class="keyword">this</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>对于作业的调度而言，要实现不同算法的调度，需要对作业的运行时间和运行资源等状态进行保存，这些离散的变量通过封装成为一个<code>JCB</code>作业控制块整体，便于统一不同算法的访问方式。</p>
+</li>
+<li><p>封装的基础——类</p>
+<p>当然，面向对象的封装不仅局限于C语言中狭义的数据封装，而是可以抽象为行为体，一个行为体自身包含表征自己状态的数据和操作自身状态的方法两个部分，所以C++中使用类，即<code>class</code>对数据和方法的抽象整体进行封装，项目中有这样的表现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UserMemorySpace</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">UserMemorySpace</span>(<span class="type">int</span> user_memory_size, <span class="type">int</span> virtual_memory_size);</span><br><span class="line">	<span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">initPageIndexArray</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">int</span> virtual_page_index)</span></span>;</span><br><span class="line">	<span class="function">PagePtr <span class="title">pop</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">inline</span> PageInfoPtr <span class="title">getPageInfo</span><span class="params">(<span class="type">int</span> virtual_page_index)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">inline</span> PagePtr <span class="title">getPage</span><span class="params">(<span class="type">int</span> virtual_page_index)</span></span>;</span><br><span class="line">	<span class="function"><span class="keyword">inline</span> <span class="type">bool</span> <span class="title">pageInUserMemory</span><span class="params">(<span class="type">int</span> virtual_page_index)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">freshPageOrder</span><span class="params">()</span></span>;</span><br><span class="line">	<span class="function">std::vector&lt;PagePtr&gt; * <span class="title">getPagesInUserMemory</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">int</span> user_memory_size_;</span><br><span class="line">	<span class="type">int</span> virtual_memory_size_;</span><br><span class="line">	<span class="comment">// help find page in memory queue</span></span><br><span class="line">	std::vector&lt;PageInfoPtr&gt; * page_index_array_;</span><br><span class="line">	std::priority_queue&lt;PagePtr, std::vector&lt;PagePtr&gt;, PriorityCmp&gt; * memory_queue_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>本项目利用<code>UserMemorySpace</code>，即用户内存空间类来对内存模型进行整体的封装，其中包含表征内存数据的内存大小和内存页数组，和表征操作内存方法的构造、初始化、出入页、清空等函数。</p>
+</li>
+<li><p>广义的逻辑封装</p>
+<p>封装性不仅仅只有类一种表现，更是一种思想的体现，它试图向我们传递在对象设计的过程中，可以通过层层封装与抽象，向更高层次的逻辑整体进发，在项目中表现如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/LeVoyageur1222/ImageBed/img_LeVoyaguer/2022/c++_00_img03_%E5%B0%81%E8%A3%85.png" alt="c++_00_img03_封装"></p>
+<p>对于请求页式内存管理的模型，项目首先设计<code>PageReplacementAlgorithm</code>即页置换算法类和<code>UserMemorySpace</code>即用户内存空间类对两个逻辑整体进行封装；之后通过关联关系关联到一个更上层的<code>PageReplacement</code>类对内存管理整体进行进一步的整体封装；再之后同样通过关联关系将类封装为<code>PageReplacementWrapper</code>即内存管理用户交互类为用户提供更加直接的操作方法接口，层层封装使得项目的整体逻辑脉络清晰，更易把握。</p>
+</li>
+</ol>
+<h4 id="保护性封装"><a href="#保护性封装" class="headerlink" title="保护性封装"></a>保护性封装</h4><p>所谓的保护性封装，就是通过设置私有对象或进行逻辑“装饰”等方法隐匿设计细节，但是为用户使用提供足够接口，在项目中的具体表现有如下两点。</p>
+<ol>
+<li><p><code>getter-setter</code>方法访问私有成员</p>
+<p>在类的设计中，为了保护数据，我们通常将成员属性定义为<code>private</code>访问，并且通过设置<code>getter-setter</code>方法保证数据在一定条件下可以获得访问控制权限。例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UserMemorySpace</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="comment">/***略去其他方法***/</span></span><br><span class="line">	<span class="function">std::vector&lt;PagePtr&gt; * <span class="title">getPagesInUserMemory</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		std::vector&lt;PagePtr&gt; * pages = <span class="keyword">new</span> std::<span class="built_in">vector</span>&lt;PagePtr&gt;();</span><br><span class="line">		<span class="keyword">for</span> (PageInfoPtr pi : *page_index_array_)</span><br><span class="line">			<span class="keyword">if</span> (pi-&gt;in_user_memory) pages-&gt;<span class="built_in">push_back</span>(pi-&gt;page);</span><br><span class="line">		<span class="keyword">return</span> pages;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">int</span> user_memory_size_;</span><br><span class="line">	<span class="type">int</span> virtual_memory_size_;</span><br><span class="line">	<span class="comment">// help find page in memory queue</span></span><br><span class="line">	std::vector&lt;PageInfoPtr&gt; * page_index_array_;</span><br><span class="line">	std::priority_queue&lt;PagePtr, std::vector&lt;PagePtr&gt;, PriorityCmp&gt; * memory_queue_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>同样在<code>UserMemorySpace</code>类中，用户数据都集中在<code>private</code>控制下保证私有访问，但是提供<code>getPagesInUserMemory</code>方法保证用户页能够被访问，从而进行内存调页模拟的进行。</p>
+</li>
+<li><p>抽象核心属性</p>
+<p>除了设置控制权限，还可以通过逻辑“装饰”隐藏数据细节，从而对数据进行保护，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 进程标识类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> Pid;</span><br><span class="line"><span class="comment">// 时间片类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> TimeSlice;</span><br><span class="line"><span class="comment">// 优先级类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> Priority;</span><br></pre></td></tr></table></figure>
+
+<p>在作业调度模型中，虽然上述的三个变量本质上都是<code>int</code>，但是通过封装为不同的具体类型进行逻辑上的修饰，这不仅是对数据实现细节的保护，同时也使得类的设计更加直观。</p>
+</li>
+</ol>
+<h3 id="继承性"><a href="#继承性" class="headerlink" title="继承性"></a>继承性</h3><p>在本项目中，作业调度和页置换算法都通过子类具体算法继承父类算法来实现，具体如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">SchedulingAlgorithm</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">initPCB</span><span class="params">(std::priority_queue&lt;JCB, std::vector&lt;JCB&gt;, std::less&lt;JCB&gt;&gt; * ready_queue, <span class="type">int</span> process_num)</span> </span>= <span class="number">0</span>;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">processPCB</span><span class="params">(JCB &amp; pcb)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FCFSSchedulingAlgorithm</span> : <span class="keyword">public</span> SchedulingAlgorithm</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">PriorityCmp</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> JCB j1, <span class="type">const</span> JCB j2)</span></span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> j1.submit_time &gt; j2.submit_time;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>通过继承的标识符<code>:</code>实现子类对父类的继承，从而实现继承中<code>is a</code>的逻辑部分，而对于具体的算法而言，使用内部结构<code>PriorityCmp</code>来实现每个子类特殊的优先级排序，从而实现继承中<code>like a</code>的逻辑部分。这样的设计在算法构造中有两个好处：</p>
+<ol>
+<li><p>便于扩展子类算法。可以直接通过实现一个新的<code>PriorityCmp</code>来扩展子类，设计简洁；</p>
+</li>
+<li><p>便于用户调用。在具体继承设计上，本项目采取模板方法+策略模式（具体分析见下），精简用户访问接口：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SimpleBatchProcessingSystemJobScheduling&lt;FCFSSchedulingAlgorithm&gt; <span class="title">js</span><span class="params">(<span class="number">4</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>用户具体函数调用只需传入想要测试的算法子类即可，便于算法扩展后的测试。</p>
+</li>
+</ol>
+<h3 id="多态性"><a href="#多态性" class="headerlink" title="多态性"></a>多态性</h3><p>多态指的是通过统一父类访问不同子类实体对象的过程，这个过程有传递对象引用进行后绑定、实现纯虚函数等多种实现方法，本项目中采取实现纯虚函数的方法实现多态，表现如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">PageReplacementAlgorithm</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> PagePtr <span class="title">getPage</span><span class="params">(<span class="type">int</span> virtual_memory_index)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OPTPageReplacementAlgorithm</span> : <span class="keyword">public</span> PageReplacementAlgorithm</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function">PagePtr <span class="title">getPage</span><span class="params">(<span class="type">int</span> virtual_memory_index)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		PagePtr page = user_memory_space_-&gt;<span class="built_in">getPage</span>(virtual_memory_index);</span><br><span class="line">		<span class="built_in">updatePageBeAgainUsedTime</span>();</span><br><span class="line">		user_memory_space_-&gt;<span class="built_in">freshPageOrder</span>();</span><br><span class="line">		user_memory_space_-&gt;<span class="built_in">push</span>(virtual_memory_index);</span><br><span class="line">		current_page_index_of_page_address_stream_++;</span><br><span class="line">		<span class="keyword">return</span> page;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在页置换算法中定义纯虚函数<code>getPage</code>，通过子类实现纯虚函数，来实现不同子类实体之间的区别，而在具体的多态调用上，本项目同样使用模板方法+策略模式，提供算法传入接口，从而实现统一访问控制。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PageReplacement&lt;OPTPageReplacementAlgorithm, </span><br><span class="line">	OPTPageReplacementAlgorithm::PriorityCmp&gt; * opt_page_replacement_;</span><br></pre></td></tr></table></figure>
+
+<h2 id="C-关键语法分析"><a href="#C-关键语法分析" class="headerlink" title="C++关键语法分析"></a>C++关键语法分析</h2><h3 id="特殊类结构"><a href="#特殊类结构" class="headerlink" title="特殊类结构"></a>特殊类结构</h3><h4 id="枚举类"><a href="#枚举类" class="headerlink" title="枚举类"></a>枚举类</h4><p>在代码实现的过程中，为了保证逻辑的直观性，通常需要对一个参量的不同取值进行逻辑的封装，并将整体封装结构抽象为一个类，这就是枚举类。在项目中，进程状态就是通过枚举类进行标识的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">ProcessStatus</span></span><br><span class="line">&#123;</span><br><span class="line">	Ready = <span class="number">0</span>,</span><br><span class="line">	Running = <span class="number">1</span>,</span><br><span class="line">	<span class="comment">//Finish = 2</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h4><p>在封装类的过程中，我们常常会发现在类的内部还存在一些相对独立的数据方法对象，此时可以通过再次封装进行进一步抽象。但是由于这里的数据方法又是独立于类外界存在的，所以再次封装出现在类的内部，即内部类。本项目中具体调度或页置换算法的比较器就是通过内部类（结构）<code>PriorityCmp</code>实现的，举例如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">FCFSSchedulingAlgorithm</span> : <span class="keyword">public</span> SchedulingAlgorithm</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">PriorityCmp</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> JCB j1, <span class="type">const</span> JCB j2)</span></span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> j1.submit_time &gt; j2.submit_time;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h3><p>本项目的构造方法有两个值得学习的亮点如下。</p>
+<h4 id="参数列表-函数构造"><a href="#参数列表-函数构造" class="headerlink" title="参数列表+函数构造"></a>参数列表+函数构造</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UserMemorySpace</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">UserMemorySpace</span>(<span class="type">int</span> user_memory_size, <span class="type">int</span> virtual_memory_size)</span><br><span class="line">		: <span class="built_in">user_memory_size_</span>(user_memory_size)</span><br><span class="line">		, <span class="built_in">virtual_memory_size_</span>(virtual_memory_size)</span><br><span class="line">		, <span class="built_in">memory_queue_</span>(<span class="keyword">new</span> std::priority_queue&lt;PagePtr, std::vector&lt;PagePtr&gt;, PriorityCmp&gt;())</span><br><span class="line">		, <span class="built_in">page_index_array_</span>(<span class="keyword">new</span> std::<span class="built_in">vector</span>&lt;PageInfoPtr&gt;(virtual_memory_size))</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">initPageIndexArray</span>();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">initPageIndexArray</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，类<code>UserMemorySpace</code>的部分成员参数通过初始化参数列表进行构造，此外，在构造函数的内部另外调用内联函数进行逻辑封装，使得整体构造函数的可读性很高。</p>
+<h4 id="结构构造"><a href="#结构构造" class="headerlink" title="结构构造"></a>结构构造</h4><p>在课堂中我们学习到，C语言的结构体+函数就是C++中面向对象的类的概念，而身为类的前身，结构体<code>struct</code>也含有他的构造方法，实现同类。本项目中也采用初始化参数列表实现结构体<code>struct</code>的构造函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">PCB</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="built_in">PCB</span>(JCBptr jcb_) : <span class="built_in">jcb</span>(jcb_)&#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>利用<code>static</code>关键字修饰的方法为类的静态方法，调用时不需要声明类的具体对象，可以直接通过类引用，例如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Util</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">bool</span> <span class="title">printJobData</span><span class="params">(<span class="type">const</span> JCB jcb)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 其他类内的引用语句</span></span><br><span class="line">	Util::<span class="built_in">printJobData</span>(jcb);</span><br></pre></td></tr></table></figure>
+
+<p>在本项目中存在一些项目的“通用方法”，这些方法很难说属于具体的那个逻辑对象实体，所以封装了<code>Util</code>即功能类对这些方法进行统一的管理。但是由于这个类只是若干方法的聚合，没有所谓的“对象”内涵，所以将方法设置为<code>static</code>静态方法，可以通过类直接调用。这种设计其实在<code>Java</code>语言中可以见到（<code>Java</code>语言中同样包含<code>util</code>工具类对一些通用方法进行管理）。</p>
+<h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><p><code>const</code>关键字用于进行常量约束。约束后的对象为常量，不可更改，可以用于控制读写权限。应用举例如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">FCFSSchedulingAlgorithm</span> : <span class="keyword">public</span> SchedulingAlgorithm</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">PriorityCmp</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> JCB j1, <span class="type">const</span> JCB j2)</span></span>;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在内部类<code>PriorityCmp</code>的<code>operator</code>方法中，传入的比较对象应该是只读的，所以用<code>const</code>修饰标识常量。</p>
+<h3 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h3><p>从设计函数的目的来看，我们通常希望对一定的操作序列进行逻辑的封装，从而提高代码的可读性。但是函数的特征决定了它具有天然的劣势：从存储空间上说，函数跳转的过程中需要内存分配空间进行现场保护，这需要占用系统的空间；而函数的跳转与返回本身需要时间。这对编译运行的效率是不利的。为了解决这样的问题，<code>inline</code>关键字应运而生。当调用由它修饰的函数时，编译器不会将该语句编译成函数调用的指令，而是直接将整个函数体的代码插人调用语句处，就像整个函数体在调用处被重写了一遍一样。这成为内联函数。项目中应用如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title">getRandom</span><span class="params">(<span class="type">const</span> <span class="type">int</span> min_val, <span class="type">const</span> <span class="type">int</span> max_val, <span class="type">int</span> match)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">srand</span>(<span class="built_in">time</span>(<span class="number">0</span>) + match);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">rand</span>() % (max_val - min_val - <span class="number">1</span>) + min_val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数用于生成随机数据，设计为内联函数可以削减短函数带来的相对大的时间空间开销。</p>
+<h3 id="overloading"><a href="#overloading" class="headerlink" title="overloading"></a>overloading</h3><p>函数重载的定义为同名不同参数的函数，通常用于实现逻辑地位相同但是实现细节有差异的函数，可以便于用户端程序员的使用。项目中的应用如下。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Util</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">bool</span> <span class="title">printJobData</span><span class="params">(<span class="type">const</span> JCB jcb)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">bool</span> <span class="title">printJobData</span><span class="params">(<span class="type">const</span> JCB jcb, <span class="type">bool</span> isMul)</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>前者是用于输出单道程序调度结果的函数，而后者是用于输出多道程序调度结果的函数，后者相较于前者多了一个<code>bool</code>参数，其本质可以看作占位符。</p>
+<h3 id="STL"><a href="#STL" class="headerlink" title="STL"></a>STL</h3><p><code>STL(standard template library)</code>是C++标准模板库，封装了大量输入输出、数据结构等标准模板供人使用，从而简化程序的设计。本项目中主要使用<code>vector</code>、<code>queue</code>和<code>priority_queue</code>三种标准模板，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> PriorityCmp&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserMemorySpace</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">int</span> user_memory_size_;</span><br><span class="line">	<span class="type">int</span> virtual_memory_size_;</span><br><span class="line">	<span class="comment">// help find page in memory queue</span></span><br><span class="line">	std::vector&lt;PageInfoPtr&gt; * page_index_array_;</span><br><span class="line">	std::priority_queue&lt;PagePtr, std::vector&lt;PagePtr&gt;, PriorityCmp&gt; * memory_queue_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>值得一提的是，优先队列中传入的比较器，就是在具体的算法类中实现的内部类<code>PriorityCmp</code>，这里的统一传入是通过模板<code>template</code>实现的，这就是上文提到的多态的细节。</p>
+<h2 id="设计模式分析"><a href="#设计模式分析" class="headerlink" title="设计模式分析"></a>设计模式分析</h2><p>本项目在设计具体作业调度和页面置换的算法时采用<strong>策略模式</strong>。所谓策略模式，指的是在多种算法相似的场景下，通过设计逻辑的算法父类进行算法的统一管理；之后在通过继承父类实现并且重写父类方法，实现具体的子类算法；最后通过多态机制对于算法进行统一访问，减小代码复杂度。具体来说，项目中的策略模式实现经过如下三个步骤：</p>
+<ol>
+<li><p>设计逻辑父类</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">PageReplacementAlgorithm</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">setPageAddressStream</span><span class="params">(std::vector&lt;<span class="type">int</span>&gt; * page_address_stream)</span> </span>&#123;&#125;;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">setCurrentPageIndexOfPageAddressStream</span><span class="params">(<span class="type">int</span> index)</span> </span>&#123;&#125;;</span><br><span class="line">	<span class="function"><span class="keyword">virtual</span> PagePtr <span class="title">getPage</span><span class="params">(<span class="type">int</span> virtual_memory_index)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>父类中的<code>getPage</code>函数是页面置换的核心函数，也是具体算法的区别所在，故设计为纯虚函数实现多态；</p>
+</li>
+<li><p>实现算法子类</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">OPTPageReplacementAlgorithm</span> : <span class="keyword">public</span> PageReplacementAlgorithm</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">PriorityCmp</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(PagePtr p1, PagePtr p2)</span></span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> p1-&gt;be_used_again_time_ &lt; p2-&gt;be_used_again_time_;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">    </span><br><span class="line">	<span class="function">PagePtr <span class="title">getPage</span><span class="params">(<span class="type">int</span> virtual_memory_index)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		PagePtr page = user_memory_space_-&gt;<span class="built_in">getPage</span>(virtual_memory_index);</span><br><span class="line">		<span class="built_in">updatePageBeAgainUsedTime</span>();</span><br><span class="line">		user_memory_space_-&gt;<span class="built_in">freshPageOrder</span>();</span><br><span class="line">		user_memory_space_-&gt;<span class="built_in">push</span>(virtual_memory_index);</span><br><span class="line">		current_page_index_of_page_address_stream_++;</span><br><span class="line">		<span class="keyword">return</span> page;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>算法子类中有两个核心。一个是之前提到的<code>getPage</code>函数，这个函数是重写父类函数的核心；第二个是比较器内部类<code>PriorityCmp</code>，是实现多态机制的核心；</p>
+</li>
+<li><p>利用模板实现多态</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> PriorityCmp&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserMemorySpace</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">int</span> user_memory_size_;</span><br><span class="line">	<span class="type">int</span> virtual_memory_size_;</span><br><span class="line">	<span class="comment">// help find page in memory queue</span></span><br><span class="line">	std::vector&lt;PageInfoPtr&gt; * page_index_array_;</span><br><span class="line">	std::priority_queue&lt;PagePtr, std::vector&lt;PagePtr&gt;, PriorityCmp&gt; * memory_queue_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>利用模板实现对比较器的统一控制，最终实现多态。</p>
+</li>
+</ol>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="代码来源"><a href="#代码来源" class="headerlink" title="代码来源"></a>代码来源</h3><ul>
+<li><p>操作系统系列：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_40697071/category_9811691.html">C++杨小帆的博客-CSDN博客</a></p>
+</li>
+<li><p>操作系统作业调度：<a target="_blank" rel="noopener" href="https://yangfan.blog.csdn.net/article/details/106698130">【计算机操作系统】作业调度算法的 C++ 实现（附源码）杨小帆的博客</a></p>
+</li>
+<li><p>操作系统存储管理：[【计算机操作系统】存储管理的 C++ 实现（附源码）杨小帆的博客](</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/18/%E3%80%90BUAA-OO%E3%80%9104-Unit4-UML%E8%A7%A3%E6%9E%90%E5%99%A8/" rel="prev" title="【BUAA-OO】04 Unit4 UML解析器">
+      <i class="fa fa-chevron-left"></i> 【BUAA-OO】04 Unit4 UML解析器
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">项目概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6"><span class="nav-number">1.1.</span> <span class="nav-text">作业调度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90"><span class="nav-number">1.1.1.</span> <span class="nav-text">项目需求分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UML%E7%B1%BB%E5%9B%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">UML类图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%88%86%E6%9E%90"><span class="nav-number">1.1.3.</span> <span class="nav-text">核心类分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">项目需求分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UML%E7%B1%BB%E5%9B%BE-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">UML类图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%B1%BB%E5%88%86%E6%9E%90-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">核心类分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%89%B9%E5%BE%81%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">面向对象特征分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%81%E8%A3%85%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">封装性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E6%80%A7%E5%B0%81%E8%A3%85"><span class="nav-number">2.1.1.</span> <span class="nav-text">逻辑性封装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%9D%E6%8A%A4%E6%80%A7%E5%B0%81%E8%A3%85"><span class="nav-number">2.1.2.</span> <span class="nav-text">保护性封装</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%A7%E6%89%BF%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">继承性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E6%80%81%E6%80%A7"><span class="nav-number">2.3.</span> <span class="nav-text">多态性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E5%85%B3%E9%94%AE%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">C++关键语法分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E7%B1%BB%E7%BB%93%E6%9E%84"><span class="nav-number">3.1.</span> <span class="nav-text">特殊类结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE%E7%B1%BB"><span class="nav-number">3.1.1.</span> <span class="nav-text">枚举类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E7%B1%BB"><span class="nav-number">3.1.2.</span> <span class="nav-text">内部类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">构造方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8-%E5%87%BD%E6%95%B0%E6%9E%84%E9%80%A0"><span class="nav-number">3.2.1.</span> <span class="nav-text">参数列表+函数构造</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E6%9E%84%E9%80%A0"><span class="nav-number">3.2.2.</span> <span class="nav-text">结构构造</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#static"><span class="nav-number">3.3.</span> <span class="nav-text">static</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const"><span class="nav-number">3.4.</span> <span class="nav-text">const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#inline"><span class="nav-number">3.5.</span> <span class="nav-text">inline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#overloading"><span class="nav-number">3.6.</span> <span class="nav-text">overloading</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#STL"><span class="nav-number">3.7.</span> <span class="nav-text">STL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">设计模式分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">5.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E6%9D%A5%E6%BA%90"><span class="nav-number">5.1.</span> <span class="nav-text">代码来源</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hz Xie"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Hz Xie</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hz Xie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
