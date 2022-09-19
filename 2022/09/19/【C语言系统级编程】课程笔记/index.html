@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levoyageur1222.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本课程是BUAA计算机学院的荣文戈老师在2022秋季学期开设的新课，是一门为计算机学院学生重新夯实C语言底层逻辑基础的课程。课程的基本介绍如下。  教材：https:&#x2F;&#x2F;www.open-std.org&#x2F;jtc1&#x2F;sc22&#x2F;wg14&#x2F;www&#x2F;docs&#x2F;n3047.pdf 使用ISO&#x2F;IEC JTC1&#x2F;WG14 C语言标准文本，是2022.8.4发布的working draft。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【C语言系统级编程】课程笔记">
+<meta property="og:url" content="https://levoyageur1222.github.io/2022/09/19/%E3%80%90C%E8%AF%AD%E8%A8%80%E7%B3%BB%E7%BB%9F%E7%BA%A7%E7%BC%96%E7%A8%8B%E3%80%91%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="LeVoyageur">
+<meta property="og:description" content="本课程是BUAA计算机学院的荣文戈老师在2022秋季学期开设的新课，是一门为计算机学院学生重新夯实C语言底层逻辑基础的课程。课程的基本介绍如下。  教材：https:&#x2F;&#x2F;www.open-std.org&#x2F;jtc1&#x2F;sc22&#x2F;wg14&#x2F;www&#x2F;docs&#x2F;n3047.pdf 使用ISO&#x2F;IEC JTC1&#x2F;WG14 C语言标准文本，是2022.8.4发布的working draft。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-19T09:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-19T08:49:14.570Z">
+<meta property="article:author" content="Hz Xie">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://levoyageur1222.github.io/2022/09/19/%E3%80%90C%E8%AF%AD%E8%A8%80%E7%B3%BB%E7%BB%9F%E7%BA%A7%E7%BC%96%E7%A8%8B%E3%80%91%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【C语言系统级编程】课程笔记 | LeVoyageur</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">LeVoyageur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://levoyageur1222.github.io/2022/09/19/%E3%80%90C%E8%AF%AD%E8%A8%80%E7%B3%BB%E7%BB%9F%E7%BA%A7%E7%BC%96%E7%A8%8B%E3%80%91%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Hz Xie">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LeVoyageur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【C语言系统级编程】课程笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-09-19 17:00:00 / 修改时间：16:49:14" itemprop="dateCreated datePublished" datetime="2022-09-19T17:00:00+08:00">2022-09-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本课程是BUAA计算机学院的荣文戈老师在2022秋季学期开设的新课，是一门为计算机学院学生重新夯实C语言底层逻辑基础的课程。课程的基本介绍如下。</p>
+<ol>
+<li><p>教材：<a target="_blank" rel="noopener" href="https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3047.pdf">https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3047.pdf</a></p>
+<p>使用ISO&#x2F;IEC JTC1&#x2F;WG14 C语言标准文本，是2022.8.4发布的working draft。</p>
+</li>
+<li><p>能够学到什么</p>
+<ul>
+<li>深入了解C语言中的内存组织</li>
+<li>深入了解C语言中的对象工作机制</li>
+<li>深入了解C语言指针和数组原理</li>
+<li>深入了解表达式和左值</li>
+<li>深入了解内存</li>
+<li>……</li>
+</ul>
+</li>
+<li><p>更直观一点？</p>
+<p>在学习本门课程以后，我们可以回答如下并不限于如下的几个问题</p>
+<ul>
+<li>数组和数组的地址？</li>
+<li>“多维”数组作为函数参数可以没有某一维度大小？</li>
+<li>sizeof的含义？</li>
+<li>const和*的奇妙化学反应？</li>
+</ul>
+</li>
+</ol>
+<p>总之，在笔者初步看来，这门课是在计算机专业课程体系中一次有意义的尝试，让我们在不断解决what和how问题的时候，返璞归真，回到why的问题上。这不失为一个培养研究能力的好机会。</p>
+<span id="more"></span>
+
+<h2 id="内存、bit与byte"><a href="#内存、bit与byte" class="headerlink" title="内存、bit与byte"></a>内存、bit与byte</h2><ul>
+<li><p>基本概念</p>
+<p>bit：表示二进制的0&#x2F;1</p>
+<p>byte：由8个bit组合成的对象，可以表示00000000~11111111的数</p>
+<blockquote>
+<p>辨析：1个byte一定等于8个bit吗？</p>
+<p>按照C语言的标准，规定一个字节的bit数为<strong>CHAR_BIT</strong>个，且规定CHAR_BIT&gt;&#x3D;8。在&lt;limits.h&gt;文件中可以找到该宏定义。</p>
+</blockquote>
+</li>
+<li><p>内存基本模型</p>
+<p>由一系列的字节（byte）顺序排列组成的存储结构，每一个字节有自己的编号，也就是地址。</p>
+<blockquote>
+<p>当把字节的地址（即第几个字节）用二进制表示时，多少位的地址就可以和多大的内存相互对应了，即：</p>
+<p><strong>n位机可以访问2^n^个字节，即可以访问2^n^大小的内存。</strong></p>
+</blockquote>
+</li>
+</ul>
+<p>【练习1】</p>
+<ol>
+<li><p>32位机最多能访问4G内存的原因是什么？</p>
+<p>答：32位机能够访问的内存byte数为2^32^个，即4G个，故访问4G内存。</p>
+</li>
+<li><p>64位机最多能访问的byte总数是多少？</p>
+<p>答：2^64^个。（理论上）</p>
+</li>
+</ol>
+<h2 id="C语言的对象"><a href="#C语言的对象" class="headerlink" title="C语言的对象"></a>C语言的对象</h2><h3 id="对象的概念"><a href="#对象的概念" class="headerlink" title="对象的概念"></a>对象的概念</h3><ul>
+<li><p>对象的定义</p>
+<p><em>objects are composed of continuous sequences of one or more bytes.</em></p>
+<blockquote>
+<p>由此看出，对象和内存有着深刻的关系，在后文的内存六元组模型中更可见一斑。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="对象的属性"><a href="#对象的属性" class="headerlink" title="对象的属性"></a>对象的属性</h3><h4 id="首地址"><a href="#首地址" class="headerlink" title="首地址"></a>首地址</h4><ul>
+<li><p>定义：对象首地址是对象占用的连续字节中<strong>第一个字节的编号</strong>（地址）。</p>
+<blockquote>
+<p>分配对象的地址有对齐（alignment）的要求，但本课程不会刻意强调。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="大小"><a href="#大小" class="headerlink" title="大小"></a>大小</h4><ul>
+<li>定义：对象大小是对象占用的连续字节的个数。</li>
+</ul>
+<h4 id="对象类型"><a href="#对象类型" class="headerlink" title="对象类型"></a>对象类型</h4><h5 id="Type的目录结构"><a href="#Type的目录结构" class="headerlink" title="Type的目录结构"></a>Type的目录结构</h5><ul>
+<li><p>Object Type（对象类型）</p>
+<ul>
+<li>Complete Object Type（完全对象类型）<ul>
+<li>Integer Type<ul>
+<li>char</li>
+<li>Unsigned Integer Type<ul>
+<li>_Bool</li>
+<li>unsigned char</li>
+<li>unsigned short int</li>
+<li>unsigned int</li>
+<li>unsigned long int</li>
+<li>unsigned long long int</li>
+<li>…</li>
+</ul>
+</li>
+<li>Signed Integer Type<ul>
+<li>signed char</li>
+<li>short int</li>
+<li>int</li>
+<li>long int</li>
+<li>long long int</li>
+</ul>
+</li>
+<li>Enumerated Type（枚举类本质也是 Integer Type）</li>
+</ul>
+</li>
+<li>Floating Related<ul>
+<li>Real Floating Type<ul>
+<li>Standard Floating Type<ul>
+<li>float</li>
+<li>double</li>
+<li>long double</li>
+</ul>
+</li>
+<li>Decimal Floating Type<ul>
+<li>_Decimal32</li>
+<li>_Decimal64</li>
+<li>_Decimal128</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Complex Type（编译器可选）<ul>
+<li>float _Complex</li>
+<li>double _Complex</li>
+<li>long double _Complex</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Character Type<ul>
+<li>char</li>
+<li>signed char</li>
+<li>unsigned char</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>【小结1】上述繁杂的类型我们可以从两个角度再次归类。</p>
+<ol>
+<li>是否可计算。我们将可计算类型称为 Arithmetic Type，基本结构如下<ul>
+<li>Arithmetic Type<ul>
+<li>Integer Type</li>
+<li>Floating Type</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>基本类型 Basic Type<ul>
+<li>Basic Type<ul>
+<li>char</li>
+<li>Unsigned Integer Type</li>
+<li>Signed Integer Type</li>
+<li>Floating Type</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<ul>
+<li>Incomplete Object Type（缺少必要信息确定Object大小的Type）<ul>
+<li>缺少元素个数的数组，如<code>extern int a[];</code></li>
+<li>Variable Length Array（可变长数组，即Length还未确定的数组）</li>
+<li>包含Incomplete Object的struct&#x2F;union</li>
+<li>void</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Derived Type（派生类型）</p>
+<ul>
+<li><p>Derived Declarator Type（派生声明类型）</p>
+<ul>
+<li><p>Array Type</p>
+<p>包含两个元素</p>
+<ol>
+<li>Element Type（T），即元素类型，需要是Object Type。</li>
+<li>Number of Elements（N），即含有元素的个数。</li>
+</ol>
+<blockquote>
+<p>故没有“多维数组”的概念，所谓的“多维数组”，就是更低一维的数组作为元素线性排列形成的新的对象类型，本质还是一维的。</p>
+</blockquote>
+<p>举例如下</p>
+<ol>
+<li>T-&gt;int，N-&gt;5，则该类型为int[5]</li>
+<li>T-&gt;int[5]，N-&gt;3，则该类型为int[3][5]</li>
+</ol>
+<blockquote>
+<p>思考：Array Type要求元素类型要是Object Type，那么int[5]本身可以作为对象类型吗？如何判断是否是对象类型？</p>
+<p>答：可以作为对象类型。利用sizeof函数进行判断，由于sizeof函数括号中引导的只能是对象类型，故有输出即为对象类型。实验如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Input</span></span><br><span class="line">&gt;&gt; <span class="built_in">printf</span>(<span class="string">&quot;sizeof(int[5]) = %d\n&quot;</span>, <span class="keyword">sizeof</span>(<span class="type">int</span>[<span class="number">5</span>]));</span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line">&gt;&gt; <span class="keyword">sizeof</span>(<span class="type">int</span>[<span class="number">5</span>]) = <span class="number">20</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>Function Type</p>
+<p>包含两个元素</p>
+<ol>
+<li>返回值类型</li>
+<li>参数的数量和类型</li>
+</ol>
+<p>基本格式如下</p>
+<p><code>Type-name(argument1-type, argument2-type, ..., argumentn-type)</code></p>
+</li>
+<li><p>Pointer Type</p>
+<p>给定任何一个Type（T），都有一个指针类型 Pointer to T，表示方法：</p>
+<ol>
+<li>简单类型：直接加*，例如int*；</li>
+<li>数组类型：在元素类型的后面加上(*)，例如int(*)[5]；</li>
+<li>指针类型：可以将指针类型视为新的对象类型，并在后面加*，例如int*视作PINT，则其指针类型为PINT*，即int**。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>Struct Type</p>
+</li>
+<li><p>Union Type</p>
+</li>
+<li><p>Atomic Type</p>
+</li>
+</ul>
+<blockquote>
+<p>【小结2】有了上述类型，我们可以进一步划分数据类型</p>
+<ol>
+<li><p>Scalar Type（数量类型）</p>
+<ul>
+<li>Arithmetic Type</li>
+<li>Pointer Type</li>
+</ul>
+</li>
+<li><p>Aggregate Type（聚合类型）</p>
+<ul>
+<li>Array Type</li>
+<li>Struct Type</li>
+</ul>
+<p>Union Type不是聚合类型，因为在任意时刻只能包含一个类型。</p>
+</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<h5 id="Type的限定符"><a href="#Type的限定符" class="headerlink" title="Type的限定符"></a>Type的限定符</h5><ol>
+<li>const</li>
+<li>volatile</li>
+<li>restrict</li>
+<li>_Atomic</li>
+</ol>
+<h5 id="Type与变量声明"><a href="#Type与变量声明" class="headerlink" title="Type与变量声明"></a>Type与变量声明</h5><p>在C语言中，我们分配对象（即一段内存）的方法有以下两种：</p>
+<ol>
+<li>变量声明</li>
+<li>使用malloc分配内存</li>
+</ol>
+<p>而变量声明就和变量的类型息息相关，下面就将介绍变量声明的基本格式。</p>
+<ul>
+<li><p>变量声明的基本要素</p>
+<p>变量声明可以形式化成格式<code>T O</code>，其中包含两个要素</p>
+<ol>
+<li>T：对象类型 Object Type；</li>
+<li>O：对象名称（标识符） Identifier</li>
+</ol>
+</li>
+<li><p>数组对象类型声明：识别元素对象类型和元素个数，其中第一维大小为元素个数，剩下的部分为元素对象类型。举例如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; <span class="type">int</span> a[<span class="number">2</span>];</span><br><span class="line"><span class="comment">// 对象类型为int[2]，变量名称为a，包含2个元素，元素对象类型为int</span></span><br><span class="line">&gt;&gt; <span class="type">int</span> b[<span class="number">2</span>][<span class="number">3</span>];</span><br><span class="line"><span class="comment">// 对象类型为int[2][3]，变量名称为b，包含2个元素，元素对象类型为int[3]</span></span><br><span class="line">&gt;&gt; <span class="type">char</span> c[<span class="number">3</span>][<span class="number">5</span>];</span><br><span class="line"><span class="comment">// 对象类型为char[3][5]，变量名称为c，包含3个元素，元素对象类型为char[5]</span></span><br><span class="line">&gt;&gt; <span class="type">double</span>* i[<span class="number">2</span>][<span class="number">3</span>][<span class="number">4</span>];</span><br><span class="line"><span class="comment">// 对象类型为double*[2][3][4]，变量名称是i，包含2个元素，元素类型为double*[3][4]（将double*看作PDOUBLE）</span></span><br></pre></td></tr></table></figure>
+
+<p>数组对象类型的大小可以通过<code>sizeof()</code>函数获取，其值可以通过简单的乘法获得，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sizeof</span>(<span class="type">int</span>[<span class="number">7</span>][<span class="number">8</span>]) = <span class="number">7</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>[<span class="number">8</span>]) = <span class="number">7</span> * <span class="number">8</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>指针对象类型的声明</p>
+<p>根据不同对象类型T分类，其指针对象类型的表示可以细化如下</p>
+<ol>
+<li><p>基本类型（int, double, char等）</p>
+<ul>
+<li>指针对象类型表示：直接在后面加*，如int*；</li>
+<li>变量声明举例：<code>int* a</code>或<code>int *a, *b</code>；</li>
+<li>指针对象类型大小：为一个指针大小，在32位机中为4；</li>
+</ul>
+</li>
+<li><p>数组类型（int[3], char[5][8]等）</p>
+<ul>
+<li>指针对象类型表示：在首个中括号前加(*)，如char(*)[5][8]；</li>
+<li>变量声明：标识符一起写在圆括号内，例如<code>char (*a)[5][8]</code>；</li>
+<li>指针对象类型大小：本质上是<strong>一个</strong>指向数组首地址的指针，故同样是一个指针大小，在32位机中为4；</li>
+</ul>
+</li>
+<li><p>指针类型（int*, double*等）</p>
+<ul>
+<li><p>指针对象类型表示：多加一个*，如int**；</p>
+</li>
+<li><p>变量声明举例：<code>int** a</code>；</p>
+<blockquote>
+<p>【思考】如下两种变量声明方式有无区别？分别声明了什么类型？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> **p, **q;</span><br><span class="line"><span class="type">int</span>* *p, *q;</span><br><span class="line"><span class="type">int</span> **p, *q;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>指针对象类型大小：指向指针的还是一个指针，32位机中为4；</p>
+</li>
+</ul>
+</li>
+<li><p>指针数组类型（int* [2], float* [3][4]等）</p>
+<ul>
+<li>指针对象类型表示：指针数组也是数组，其指针对象类型和简单数组的表示一样，例如int*(*)[2][3]（把int*看作PINT）；</li>
+<li>变量声明举例：标识符还是要写圆括号里，例如<code>int* (*p)[2][3]</code>；</li>
+<li>指针对象类型大小：本质上也是指向数组首地址的一个指针，32位机4；</li>
+</ul>
+</li>
+<li><p>数组指针类型（int(*)[2]等）</p>
+<ul>
+<li>指针对象类型表示：数组指针也是指针，故也多加一个*即可，例如<code>int(**)[2]</code>；</li>
+<li>变量声明举例：标识符写圆括号里，例如<code>int (**p)[2]</code>；</li>
+<li>指针对象类型大小：本质上也是一个指向指针的指针，32位机4；</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<p>【练习2】</p>
+<ol>
+<li><p>int**[3]对象包含几个元素，每个元素是什么类型？</p>
+<p>答：包含3个元素，每个元素类型为int**。</p>
+</li>
+<li><p>指向int**[3]对象类型的指针对象类型是什么？</p>
+<p>答：int**(*)3。</p>
+</li>
+<li><p>声明一个变量，使得变量名为a，对象类型为int**[3]</p>
+<p>答：int** a[3]。</p>
+</li>
+<li><p>观察下列代码，写出各个变量的类型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span>* PINT;</span><br><span class="line"><span class="type">int</span>* p, q;</span><br><span class="line">PINT r, s;</span><br><span class="line">PINT* t = &amp;r;</span><br></pre></td></tr></table></figure>
+
+<p>答：p，r，s为int*类型，q为int类型，t为int**类型。</p>
+</li>
+</ol>
+<blockquote>
+<p>【思考】如何用typedef重新定义数组对象类型，如int[3]？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> VINT[<span class="number">3</span>];</span><br><span class="line"><span class="comment">// 等价于int e[3];</span></span><br><span class="line">VINT e;</span><br><span class="line"><span class="comment">// 等价于int (*p)[3] = &amp;e;</span></span><br><span class="line">VINT* p = &amp;e;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="对象名字"><a href="#对象名字" class="headerlink" title="对象名字"></a>对象名字</h4><p>上文我们提到，对象是内存中一段连续的字节，而在内存中分配空间有两种方法，在这两种方法下对象名字也是有不同内涵的</p>
+<ol>
+<li><p>对象声明，例如<code>T O</code>。</p>
+<p>此时我们称O为对象的标识符，也就是对象的名字；</p>
+</li>
+<li><p>动态分配，例如<code>malloc(4)</code>。</p>
+<p>此时这块对象没有标识符，也就没有对象名字。</p>
+</li>
+</ol>
+<h4 id="对象表示"><a href="#对象表示" class="headerlink" title="对象表示"></a>对象表示</h4><p>对象表示(Object Representation)是对象对应的内存空间存储的<strong>二进制串</strong>。</p>
+<h4 id="对象值"><a href="#对象值" class="headerlink" title="对象值"></a>对象值</h4><p>对象的值(Object Value)和对象类型、对象表示均有关系。</p>
+<blockquote>
+<p>为此我们可以简单做如下理解：在获取对象表示后，我们相当于获得了一个连续的二进制串，但是我们并不知道这个串的具体内涵，例如对于串1001，我们用<code>unsigned int</code>类型来理解的话会认为它的值是9，而用<code>int</code>来理解的话则会认为他的值是-7，故明确对象类型后我们就可以知道对象的值了。</p>
+</blockquote>
+<p>所以此处我们利用一个二元组<code>&lt;Value, Value Type&gt;</code>表示对象的值，其中</p>
+<ul>
+<li><p>当对象是非数组对象类型时，<code>Value</code>直接按照类型翻译，而<code>Value Type</code>则直接取对象类型。</p>
+<p>举例：对于<code>int a = 1</code>的对象声明的空间，我们认为其值为<code>&lt;1, int&gt;</code>。</p>
+</li>
+<li><p>当对象是数组对象类型时，<code>Value</code>是第一个元素的首地址，而<code>Value Type</code>是数组元素类型对应的指针类型。</p>
+<p>举例：对于<code>int b[1] = &#123;1&#125;</code>的对象声明的空间，我们认为其值为<code>&lt;Address, int*&gt;</code>，其中<code>Address</code>为数组第一个元素的首地址。</p>
+</li>
+</ul>
+<h2 id="内存六元组模型"><a href="#内存六元组模型" class="headerlink" title="内存六元组模型"></a>内存六元组模型</h2><h3 id="内存的基本操作"><a href="#内存的基本操作" class="headerlink" title="内存的基本操作"></a>内存的基本操作</h3><ol>
+<li><p>分配内存</p>
+<ul>
+<li>通过变量声明来分配内存</li>
+<li>通过malloc来分配内存</li>
+</ul>
+</li>
+<li><p>内存赋值</p>
+</li>
+<li><p>释放内存</p>
+</li>
+<li><p>读取内存相关信息</p>
+<blockquote>
+<p>如何描述内存？假设进行如下声明<code>int a;</code></p>
+<ul>
+<li>连续内存的第一个字节编号-&gt;内存地址</li>
+<li>内存的变量类型为int-&gt;对象类型</li>
+<li>内存的别名为a-&gt;变量名称</li>
+<li>内存占4各字节-&gt;内存大小</li>
+<li>内存的表示值-&gt;&lt;Value, Value_Type&gt;</li>
+</ul>
+</blockquote>
+</li>
+</ol>
+<p><strong>【注意】</strong>变量类型（Object_Type）v.s. 值的类型（Value_Type）</p>
+<ol>
+<li><p>区别</p>
+<ul>
+<li>变量类型：Physical View，在内存分配时出现，用于确定内存空间大小；</li>
+<li>值的类型：Logical View，在写值和取值时出现，与值的表示共同组成值；</li>
+</ul>
+</li>
+<li><p>联系：变量类型<code>Obj_T</code>和内存表示值<code>&lt;V, V_T&gt;</code>有对应关系</p>
+<ul>
+<li><p><code>Obj_T</code>为非数组类型→<code>V_T = Obj_T</code>，<code>V</code>为按照<code>Obj_T</code>观察内存的结果；</p>
+<blockquote>
+<p>举例：<code>int a = 4</code>，则<code>Obj_T = int, &lt;V, V_T&gt; = &lt;4, int&gt;</code>。</p>
+</blockquote>
+</li>
+<li><p><code>Obj_T</code>为数组类型→<code>V_T</code>为数组元素类型对应的指针类型，<code>V</code>是首地址；</p>
+<blockquote>
+<p>举例：<code>int a[10]</code>，则<code>Obj_T = int[10], &lt;V, V_T&gt; = &lt;addr, int*&gt;</code>。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ol>
+<p>【练习3】指出下列声明语句对应内存的变量类型和值的类型。</p>
+<ol>
+<li><p>char c;</p>
+<p>Obj_T &#x3D; char, V_T &#x3D; char</p>
+</li>
+<li><p>double d;</p>
+<p>Obj_T &#x3D; double, V_T &#x3D; double</p>
+</li>
+<li><p>float f[3][4]</p>
+<p>Obj_T &#x3D; float[3][4], V_T &#x3D; float(*)[4]</p>
+</li>
+<li><p>int* p[3]</p>
+<p>Obj_T &#x3D; int*[3], V_T &#x3D; int**</p>
+</li>
+</ol>
+<h3 id="内存六元组模型描述"><a href="#内存六元组模型描述" class="headerlink" title="内存六元组模型描述"></a>内存六元组模型描述</h3><p>对象的本质就是一段内存，但是仅仅描述为对应内存空间的二进制串又欠妥，为此本门课程提出描述内存的逻辑模型——内存六元组模型。</p>
+<p><code>Object = &#123;Address, Object_Type, Name, Size, Value, Value_Type&#125;</code></p>
+<ul>
+<li>Address：内存地址，由系统分配，分配以后无法修改；</li>
+<li>Object_Type：变量声明时指定的变量类型；</li>
+<li>Name：变量声明时指定的变量名；</li>
+<li>Size：内存大小（单位：字节数）；</li>
+<li>Value：内存对应的值；</li>
+<li>Value_Type：内存对应的值的类型。</li>
+</ul>
+<h3 id="从内存六元组模型看内存操作"><a href="#从内存六元组模型看内存操作" class="headerlink" title="从内存六元组模型看内存操作"></a>从内存六元组模型看内存操作</h3><h4 id="malloc分配内存"><a href="#malloc分配内存" class="headerlink" title="malloc分配内存"></a>malloc分配内存</h4><p><code>malloc</code>只进行了在内存指定位置开辟空间的操作，故分配后的内存六元组只包含两个信息。举例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">malloc</span>(<span class="number">16</span>);</span><br><span class="line">&gt;&gt; &#123;Address, N/A, N/A, <span class="number">16</span>, N/A, N/A&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="变量声明与赋值"><a href="#变量声明与赋值" class="headerlink" title="变量声明与赋值"></a>变量声明与赋值</h4><ul>
+<li>整型变量声明与赋值</li>
+<li>浮点变量声明与赋值</li>
+<li>字符变量声明与赋值</li>
+<li>指针变量声明与赋值</li>
+<li>数组变量声明与赋值</li>
+<li>结构体变量声明与赋值</li>
+<li>联合体变量声明与赋值</li>
+</ul>
+<h4 id="读取内存相关信息"><a href="#读取内存相关信息" class="headerlink" title="读取内存相关信息"></a>读取内存相关信息</h4><p>对于一个对象a，有三种读取内存信息的操作，对应的内存六元组模型如下</p>
+<ul>
+<li>读取a</li>
+<li>读取&amp;a</li>
+<li>读取sizeof(a)</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/06/%E3%80%90%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86%E3%80%9101-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" rel="prev" title="【数据库系统原理】01 数据库系统概述">
+      <i class="fa fa-chevron-left"></i> 【数据库系统原理】01 数据库系统概述
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E3%80%81bit%E4%B8%8Ebyte"><span class="nav-number">1.</span> <span class="nav-text">内存、bit与byte</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">C语言的对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">对象的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">对象的属性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A6%96%E5%9C%B0%E5%9D%80"><span class="nav-number">2.2.1.</span> <span class="nav-text">首地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.2.3.</span> <span class="nav-text">对象类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Type%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">Type的目录结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Type%E7%9A%84%E9%99%90%E5%AE%9A%E7%AC%A6"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">Type的限定符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Type%E4%B8%8E%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">Type与变量声明</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%90%8D%E5%AD%97"><span class="nav-number">2.2.4.</span> <span class="nav-text">对象名字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E8%A1%A8%E7%A4%BA"><span class="nav-number">2.2.5.</span> <span class="nav-text">对象表示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%80%BC"><span class="nav-number">2.2.6.</span> <span class="nav-text">对象值</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%85%AD%E5%85%83%E7%BB%84%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">内存六元组模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">内存的基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%85%AD%E5%85%83%E7%BB%84%E6%A8%A1%E5%9E%8B%E6%8F%8F%E8%BF%B0"><span class="nav-number">3.2.</span> <span class="nav-text">内存六元组模型描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E5%86%85%E5%AD%98%E5%85%AD%E5%85%83%E7%BB%84%E6%A8%A1%E5%9E%8B%E7%9C%8B%E5%86%85%E5%AD%98%E6%93%8D%E4%BD%9C"><span class="nav-number">3.3.</span> <span class="nav-text">从内存六元组模型看内存操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#malloc%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98"><span class="nav-number">3.3.1.</span> <span class="nav-text">malloc分配内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E4%B8%8E%E8%B5%8B%E5%80%BC"><span class="nav-number">3.3.2.</span> <span class="nav-text">变量声明与赋值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E5%86%85%E5%AD%98%E7%9B%B8%E5%85%B3%E4%BF%A1%E6%81%AF"><span class="nav-number">3.3.3.</span> <span class="nav-text">读取内存相关信息</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hz Xie"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Hz Xie</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hz Xie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
